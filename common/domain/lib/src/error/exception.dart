@@ -1,0 +1,1 @@
+class TodoListException implements Exception {}
