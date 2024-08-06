@@ -10,6 +10,7 @@ dependencies:
   bloc: ^8.1.4
   di:
     path: ./core/di
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6

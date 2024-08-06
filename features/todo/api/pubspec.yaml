@@ -1,0 +1,23 @@
+name: todo_api
+description: todo api
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.4.0
+  flutter: ^3.22.0
+
+dependencies:
+  domain:
+    path: ../../../common/domain
+  either_dart: ^1.0.0
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+  uuid: ^4.4.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  very_good_analysis: ^6.0.0
