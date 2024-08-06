@@ -6,3 +6,5 @@ export 'src/error/exception.dart';
 export 'src/error/failure.dart';
 export 'src/mapper/data_mapper.dart';
 export 'src/usecase.dart';
+export 'src/valueobject/base_id.dart';
+export 'src/valueobject/value_objects.dart';

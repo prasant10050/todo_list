@@ -1,3 +1,5 @@
-abstract class DataMapper<Type> {
-  Type mapToEntity();
+abstract class Mapper<E, D> {
+  D mapFromEntity(E entity);
+
+  E mapToEntity(D dto);
 }
