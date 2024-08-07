@@ -1,7 +1,7 @@
 import 'package:domain/domain.dart';
 import 'package:todo_api/api.dart';
 
-final class TodoRepository extends ITodoRepository {
+class TodoRepository implements ITodoRepository {
   TodoRepository({required this.dataSource, required this.mapper});
 
   final ITodoDataSource dataSource;

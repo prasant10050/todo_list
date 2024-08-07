@@ -78,3 +78,31 @@ final class FilterTodoRequested extends TodoEvent {
   @override
   List<Object?> get props => [filter];
 }
+
+final class OpenAddTodoDialogRequested extends TodoEvent {
+  const OpenAddTodoDialogRequested({this.hasOpened=true});
+  final bool hasOpened;
+  @override
+  List<Object?> get props => [hasOpened];
+}
+
+final class OpenEditTodoDialogRequested extends TodoEvent {
+  const OpenEditTodoDialogRequested({this.hasOpened=true});
+  final bool hasOpened;
+  @override
+  List<Object?> get props => [hasOpened];
+}
+
+final class ShowTodoDetailsRequested extends TodoEvent {
+  const ShowTodoDetailsRequested({this.hasOpened=true});
+  final bool hasOpened;
+  @override
+  List<Object?> get props => [hasOpened];
+}
+
+final class DiscardTodoDialogRequested extends TodoEvent {
+  const DiscardTodoDialogRequested({this.hasDiscard=true});
+  final bool hasDiscard;
+  @override
+  List<Object?> get props => [hasDiscard];
+}

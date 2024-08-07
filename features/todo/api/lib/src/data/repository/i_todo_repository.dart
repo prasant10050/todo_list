@@ -2,7 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:either_dart/either.dart';
 import 'package:todo_api/api.dart';
 
-abstract base class ITodoRepository {
+abstract class ITodoRepository {
   Future<Either<Failure, TodoEntity>> addTodo(TodoEntity todoEntity);
 
   Future<Either<Failure, TodoEntity>> updateTodo(TodoEntity todoEntity);

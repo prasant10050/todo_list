@@ -22,12 +22,13 @@ class AppBlocObserver extends BlocObserver {
 }
 
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  ApplicationDependenciesModuleResolver.register();
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
 
   Bloc.observer = const AppBlocObserver();
-  ApplicationDependenciesModuleResolver.register();
 
   // Add cross-flavor configuration here
 

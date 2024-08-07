@@ -1,7 +1,7 @@
 import 'package:domain/domain.dart';
 import 'package:todo_api/api.dart';
 
-class TodoMapper extends Mapper<TodoEntity, TodoDto> {
+class TodoMapper implements Mapper<TodoEntity, TodoDto> {
   @override
   TodoDto mapFromEntity(TodoEntity entity) => TodoDto(
         title: entity.title,

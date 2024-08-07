@@ -9,10 +9,11 @@ class TodoDependencyModuleResolver {
   static const String local = 'local';
 
   static void register({bool isMemory = false}) {
-    _registerTodoDependencies(isMemory: isMemory);
+    _registerTodoDataDependencies(isMemory: isMemory);
+    _registerTodoDomainDependencies(isMemory: isMemory);
   }
 
-  static void _registerTodoDependencies({bool isMemory = false}) {
+  static void _registerTodoDataDependencies({bool isMemory = false}) {
     // Mapper
     DependencyProvider.registerLazySingleton<Mapper<TodoEntity, TodoDto>>(
       TodoMapper.new,
@@ -25,13 +26,13 @@ class TodoDependencyModuleResolver {
 
     // Data Sources
     DependencyProvider.registerLazySingleton<ITodoDataSource>(
-      () => TodoInMemoryDataSource(
+      ()=>TodoInMemoryDataSource(
         mapper: DependencyProvider.get<Mapper<TodoEntity, TodoDto>>(),
       ),
       instanceName: inMemory,
     );
     DependencyProvider.registerLazySingleton<ITodoDataSource>(
-      () => TodoLocalDataSource(
+          ()=>TodoLocalDataSource(
         mapper: DependencyProvider.get<Mapper<TodoEntity, TodoDto>>(),
         storage: DependencyProvider.get<BaseStorage<TodoEntity, TodoDto>>(),
       ),
@@ -40,70 +41,81 @@ class TodoDependencyModuleResolver {
 
     // Repository
     DependencyProvider.registerLazySingleton<ITodoRepository>(
-      () => TodoRepository(
+          ()=>TodoRepository(
         dataSource: DependencyProvider.get<ITodoDataSource>(
           instanceName: isMemory ? inMemory : local,
         ),
         mapper: DependencyProvider.get<Mapper<TodoEntity, TodoDto>>(),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
+  }
 
+  static void _registerTodoDomainDependencies({bool isMemory = false}) {
     // UseCase
-    DependencyProvider.registerLazySingleton<IAddTodoUsecase>(
-      () => AddTodoUsecase(
+    DependencyProvider.registerLazySingleton<AddTodoUsecase>(
+          ()=>AddTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IGetAllTodoUsecase>(
-      () => GetAllTodoUsecase(
+    DependencyProvider.registerLazySingleton<GetAllTodoUsecase>(
+          ()=>GetAllTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IFilterAllTodoUsecase>(
+    DependencyProvider.registerLazySingleton<FilterAllTodoUsecase>(
       () => FilterAllTodoUsecase(
-        getAllTodoUsecase: DependencyProvider.get<IGetAllTodoUsecase>(
+        getAllTodoUsecase: DependencyProvider.get<GetAllTodoUsecase>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IGetTodoUsecase>(
-      () => GetTodoUsecase(
+    DependencyProvider.registerLazySingleton<GetTodoUsecase>(
+          ()=>GetTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IMarkTodoUsecase>(
+    DependencyProvider.registerLazySingleton<MarkTodoUsecase>(
       () => MarkTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IRemoveAllTodoUsecase>(
+    DependencyProvider.registerLazySingleton<RemoveAllTodoUsecase>(
       () => RemoveAllTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IRemoveTodoUsecase>(
+    DependencyProvider.registerLazySingleton<RemoveTodoUsecase>(
       () => RemoveTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
-    DependencyProvider.registerLazySingleton<IUpdateTodoUsecase>(
+    DependencyProvider.registerLazySingleton<UpdateTodoUsecase>(
       () => UpdateTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
+      instanceName: isMemory ? inMemory : local,
     );
   }
 }

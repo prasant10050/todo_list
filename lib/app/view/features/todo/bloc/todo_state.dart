@@ -10,13 +10,31 @@ final class TodoInitial extends TodoState {
   List<Object> get props => [];
 }
 
-final class AddTodoLoading extends TodoState {
-  const AddTodoLoading({required this.isLoading});
+final class TodoLoading extends TodoState {
+  const TodoLoading({this.isLoading = true});
 
   final bool isLoading;
 
   @override
   List<Object> get props => [isLoading];
+}
+
+final class TodoProcessing extends TodoState {
+  const TodoProcessing({this.isProcessing = true});
+
+  final bool isProcessing;
+
+  @override
+  List<Object> get props => [isProcessing];
+}
+
+final class TodoEmpty extends TodoState {
+  const TodoEmpty({this.message = 'Todo is empty'});
+
+  final String message;
+
+  @override
+  List<Object> get props => [message];
 }
 
 final class AddTodoSuccess extends TodoState {
@@ -108,4 +126,32 @@ final class FilterTodoState extends TodoState {
 
   @override
   List<Object?> get props => [filter, todoEntities];
+}
+
+final class OpenAddTodoDialogState extends TodoState {
+  const OpenAddTodoDialogState({this.hasOpened=true});
+  final bool hasOpened;
+  @override
+  List<Object?> get props => [hasOpened];
+}
+
+final class DiscardTodoDialogState extends TodoState {
+  const DiscardTodoDialogState({this.hasDiscard=true});
+  final bool hasDiscard;
+  @override
+  List<Object?> get props => [hasDiscard];
+}
+
+final class OpenEditTodoDialogState extends TodoState {
+  const OpenEditTodoDialogState({this.hasOpened=true});
+  final bool hasOpened;
+  @override
+  List<Object?> get props => [hasOpened];
+}
+
+final class ShowTodoDetailsState extends TodoState {
+  const ShowTodoDetailsState({this.hasOpened=true});
+  final bool hasOpened;
+  @override
+  List<Object?> get props => [hasOpened];
 }

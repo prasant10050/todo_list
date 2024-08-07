@@ -11,7 +11,7 @@ class DependencyProvider {
   static final configurationItems = <DiRegistrationItem>[];
 
   static bool isRegistered<T extends Object>(
-      {Object? instance, String? instanceName}) {
+      {Object? instance, String? instanceName,}) {
     return _di.isRegistered<T>(instance: instance, instanceName: instanceName);
   }
 
@@ -27,15 +27,22 @@ class DependencyProvider {
     }
   }
 
+  static void registerSingleton<T extends Object>(
+      T instance, {
+        String? instanceName,
+      }) {
+    _di.registerSingleton<T>(instance, instanceName: instanceName);
+  }
+
   static void registerLazySingleton<T extends Object>(T Function() factory,
-      {String? instanceName}) {
-    _di.registerLazySingleton(factory, instanceName: instanceName);
+      {String? instanceName,}) {
+    _di.registerLazySingleton<T>(factory, instanceName: instanceName);
     configurationItems.add(DiRegistrationItem(T, instanceName: instanceName));
   }
 
   static void registerFactory<T extends Object>(T Function() factory,
-      {String? instanceName}) {
-    _di.registerFactory(factory, instanceName: instanceName);
+      {String? instanceName,}) {
+    _di.registerFactory<T>(factory, instanceName: instanceName);
     configurationItems.add(DiRegistrationItem(T, instanceName: instanceName));
   }
 

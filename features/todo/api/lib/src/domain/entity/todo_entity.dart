@@ -1,6 +1,7 @@
 import 'package:domain/domain.dart';
 import 'package:either_dart/src/either.dart';
 import 'package:todo_api/api.dart';
+import 'package:todo_api/src/api.dart';
 
 class TodoEntity extends ValueObject<ValueFailure,TaskId>{
   const TodoEntity({

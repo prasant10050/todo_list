@@ -14,3 +14,4 @@ export 'domain/valueobject/todo_id.dart';
 export 'data/dto/todo_dto.dart';
 export 'package:uuid/uuid.dart';
 export 'package:either_dart/either.dart';
+export 'package:domain/domain.dart';
