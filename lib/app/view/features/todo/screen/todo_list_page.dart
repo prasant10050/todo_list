@@ -47,7 +47,7 @@ class _TodoListPageState extends State<TodoListPage> {
 
   Future<TodoEntity?> _openDialog(
     TodoEntity? todoEntity,
-    TodoCallback? onEdit, {
+    {
     bool isNew = true,
     bool showMeDetails = false,
   }) {
@@ -58,7 +58,6 @@ class _TodoListPageState extends State<TodoListPage> {
         key: todoEntity?.taskId != null ? ValueKey(todoEntity) : UniqueKey(),
         todoEntity: todoEntity,
         isNew: isNew,
-        onEdit: onEdit,
         showMeDetails: showMeDetails,
       ),
     );
@@ -267,7 +266,7 @@ class _TodoListPageState extends State<TodoListPage> {
         } else {
           Future.delayed(
             Durations.short2,
-            () async => _openDialog(null, null),
+            () async => _openDialog(null),
           );
         }
       },
@@ -277,7 +276,7 @@ class _TodoListPageState extends State<TodoListPage> {
         } else {
           Future.delayed(
             Durations.short2,
-            () async => _openDialog(state.todoEntity, null, isNew: false),
+            () async => _openDialog(state.todoEntity, isNew: false),
           );
         }
       },
@@ -292,7 +291,6 @@ class _TodoListPageState extends State<TodoListPage> {
             Durations.short2,
             () async => _openDialog(
               state.todoEntity,
-              null,
               isNew: false,
               showMeDetails: true,
             ),

@@ -68,7 +68,7 @@ class LocalSembastDataDao implements BaseStorage {
       LocalSembastDatabase.instance.todo;
 
   @override
-  Future<void> clear() async{
+  Future<void> clear() async {
     final db = await _db;
     await db.transaction((transaction) async {
       // Delete all
@@ -78,14 +78,14 @@ class LocalSembastDataDao implements BaseStorage {
   }
 
   @override
-  Future<void> delete(String id) async{
+  Future<void> delete(String id) async {
     await _todoStore.record(id).delete(await _db);
   }
 
   @override
-  Future<List<Map<String,dynamic>>> getAll() async{
+  Future<List<Map<String, dynamic>>> getAll() async {
     final records = await _todoStore.find(await _db);
-    final data=<Map<String,dynamic>>[];
+    final data = <Map<String, dynamic>>[];
     records.map((snapshot) {
       final todo = snapshot.value;
       data.add(MapEntry(snapshot.key, todo) as Map<String, dynamic>);
@@ -94,32 +94,38 @@ class LocalSembastDataDao implements BaseStorage {
   }
 
   @override
-  Stream<Map<String, dynamic>> getAllStreamValuesInMap() async*{
-    final data=<String,dynamic>{};
+  Stream<Map<String, dynamic>> getAllStreamValuesInMap() async* {
+    final data = <String, dynamic>{};
     _todoStore.query().onSnapshots(await _db).map((snapshots) {
       return snapshots.map((snapshot) {
         final todo = snapshot.value;
-        data.putIfAbsent(snapshot.key, () => todo,);
+        data.putIfAbsent(
+          snapshot.key,
+          () => todo,
+        );
       }).toList();
     });
     yield data;
   }
 
   @override
-  Future<Map<String, dynamic>?> getAllValuesInMap() async{
+  Future<Map<String, dynamic>?> getAllValuesInMap() async {
     final records = await _todoStore.find(await _db);
-    final data=<String,dynamic>{};
+    final data = <String, dynamic>{};
     records.map((snapshot) {
       final todo = snapshot.value;
-      return data.putIfAbsent(snapshot.key, () => todo,);
+      return data.putIfAbsent(
+        snapshot.key,
+        () => todo,
+      );
     }).toList();
     return data;
   }
 
   @override
-  Future<dynamic> getByKey(String id, {dynamic defaultValue}) async{
+  Future<dynamic> getByKey(String id, {dynamic defaultValue}) async {
     final record = await _todoStore.record(id).get(await _db);
-    return record??defaultValue;
+    return record ?? defaultValue;
   }
 
   @override
@@ -128,11 +134,16 @@ class LocalSembastDataDao implements BaseStorage {
 
   @override
   Future<void> put(String id, Map<String, dynamic> entity) async {
-    await _todoStore.record(id).put(await _db, entity);
+    await _todoStore.record(id).put(
+          await _db,
+          entity,
+          merge: false,
+          ifNotExists: true,
+        );
   }
 
   @override
-  Future<void> update(String id, Map<String, dynamic> entity) async{
-    await _todoStore.record(id).update(await _db, entity);
+  Future<void> update(String id, Map<String, dynamic> entity) async {
+    await _todoStore.record(id).put(await _db, entity, merge: true);
   }
 }

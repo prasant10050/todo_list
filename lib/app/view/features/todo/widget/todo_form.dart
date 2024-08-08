@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_api/api.dart';
-import 'package:todo_list_app/app/common/todo_actions.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
@@ -12,14 +11,12 @@ class TodoForm extends StatefulWidget {
   const TodoForm({
     super.key,
     this.todoEntity,
-    this.isNew = false,
-    this.onEdit,
+    this.isNew = true,
     this.showMeDetails = false,
   });
 
   final bool isNew;
   final TodoEntity? todoEntity;
-  final TodoCallback? onEdit;
   final bool showMeDetails;
 
   @override
@@ -154,6 +151,9 @@ class _TodoFormState extends State<TodoForm> {
                     context,
                     title: 'Discard changes?',
                     content: 'Are you sure you want to discard your changes?',
+                    onConfirm: () => context.read<AddTodoBloc>().add(
+                          const DiscardTodoDialogRequested(hasDiscard: false),
+                        ),
                   );
                 },
                 child: const Text('Discard'),
@@ -163,7 +163,8 @@ class _TodoFormState extends State<TodoForm> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState?.save();
                     final title = textInputTitleController.value.text;
-                    final description = textInputDescriptionController.value.text;
+                    final description =
+                        textInputDescriptionController.value.text;
                     final entity = widget.todoEntity;
                     // Edit or update `todo`
                     if (!widget.isNew && entity != null) {
@@ -171,6 +172,7 @@ class _TodoFormState extends State<TodoForm> {
                         title: title,
                         description: description,
                       );
+
                       context
                           .read<UpdateTodoBloc>()
                           .add(UpdateTodoRequested(todoEntity: copyEntity));
