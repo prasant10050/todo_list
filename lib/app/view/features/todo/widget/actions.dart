@@ -38,8 +38,6 @@ Future<bool> confirm(
     BuildContext context, {
       String title = 'Confirm',
       String? content,
-      VoidCallback? onCancel,
-      VoidCallback? onConfirm
     }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -49,11 +47,11 @@ Future<bool> confirm(
       actions: [
         TextButton(
           child: const Text('Cancel'),
-          onPressed: () => onCancel??Navigator.of(context).pop(false),
+          onPressed: () => Navigator.of(context).pop(false),
         ),
         TextButton(
           child: const Text('Confirm'),
-          onPressed: () => onConfirm??Navigator.of(context).pop(true),
+          onPressed: () => Navigator.of(context).pop(true),
         ),
       ],
     ),

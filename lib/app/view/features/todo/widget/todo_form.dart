@@ -5,7 +5,6 @@ import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
-import 'package:todo_list_app/app/view/features/todo/widget/actions.dart';
 
 class TodoForm extends StatefulWidget {
   const TodoForm({
@@ -137,26 +136,22 @@ class _TodoFormState extends State<TodoForm> {
             ]
           : [
               TextButton(
-                onPressed: () async {
-                  final title = textInputTitleController.value.text;
-                  final description = textInputDescriptionController.value.text;
-                  final canCancel = title.isEmpty || description.isEmpty;
-                  if (canCancel) {
-                    context.read<AddTodoBloc>().add(
-                          const DiscardTodoDialogRequested(hasDiscard: false),
+                onPressed: () {
+                  if (!widget.isNew && widget.todoEntity != null) {
+                    context.read<UpdateTodoBloc>().add(
+                          OpenEditTodoDialogRequested(
+                            todoEntity: widget.todoEntity!,
+                            hasOpened: false,
+                          ),
                         );
-                    return;
+                  } else {
+                    context.read<AddTodoBloc>().add(
+                          const OpenAddTodoDialogRequested(hasOpened: false),
+                        );
                   }
-                  await confirm(
-                    context,
-                    title: 'Discard changes?',
-                    content: 'Are you sure you want to discard your changes?',
-                    onConfirm: () => context.read<AddTodoBloc>().add(
-                          const DiscardTodoDialogRequested(hasDiscard: false),
-                        ),
-                  );
+                  return;
                 },
-                child: const Text('Discard'),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () async {
@@ -176,7 +171,7 @@ class _TodoFormState extends State<TodoForm> {
                       context
                           .read<UpdateTodoBloc>()
                           .add(UpdateTodoRequested(todoEntity: copyEntity));
-                    }else{
+                    } else {
                       // New entry `todo`
                       final todo = TodoEntity(
                         title: title,

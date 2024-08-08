@@ -281,7 +281,9 @@ class _TodoListPageState extends State<TodoListPage> {
         }
       },
       discardTodo: (state) {
-        Navigator.of(context).pop();
+        if(state.hasDiscard) {
+          Navigator.of(context).pop();
+        }
       },
       todoDetails: (state) {
         if (!state.hasOpened) {
