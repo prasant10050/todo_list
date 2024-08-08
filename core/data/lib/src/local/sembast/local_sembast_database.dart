@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
+import 'package:sembast/utils/value_utils.dart';
 import 'package:sembast_web/sembast_web.dart';
 
 class LocalSembastDatabase {
@@ -144,6 +145,11 @@ class LocalSembastDataDao implements BaseStorage {
 
   @override
   Future<void> update(String id, Map<String, dynamic> entity) async {
-    await _todoStore.record(id).put(await _db, entity, merge: true);
+    final value=await getByKey(id) as Map<String,dynamic>;
+    var map = cloneMap(value);
+    map=entity;
+    await _todoStore.record(id).put(await _db, map, merge: true);
+    final updatedRecord=await getByKey(id) as Map<String,dynamic>;
+    print('Updated record: $updatedRecord');
   }
 }

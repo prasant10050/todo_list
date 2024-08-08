@@ -23,10 +23,11 @@ class AddTodoBloc extends Bloc<TodoEvent, TodoState> {
     final result = await addTodoUsecase(event.todoEntity);
     emit(const TodoProcessing(isProcessing: false));
 
-    return result.fold(
+    result.fold(
       (left) => emit(TodoFailure(message: left.message)),
       (right) => emit(AddTodoSuccess(todoEntity: right)),
     );
+    emit(const OpenAddTodoDialogState(hasOpened: false));
   }
 
   void _handleOpenAddTodoDialog(

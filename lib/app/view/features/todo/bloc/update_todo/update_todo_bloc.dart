@@ -25,6 +25,7 @@ class UpdateTodoBloc extends Bloc<TodoEvent, TodoState> {
       (left) => emit(TodoFailure(message: left.message)),
       (right) => emit(UpdateTodoState(todoEntity: right)),
     );
+    emit(OpenEditTodoDialogState(hasOpened: false,todoEntity:event.todoEntity));
   }
 
   Future<void> _handleOpenEditTodoDialog(

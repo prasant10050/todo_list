@@ -176,16 +176,17 @@ class _TodoFormState extends State<TodoForm> {
                       context
                           .read<UpdateTodoBloc>()
                           .add(UpdateTodoRequested(todoEntity: copyEntity));
+                    }else{
+                      // New entry `todo`
+                      final todo = TodoEntity(
+                        title: title,
+                        description: description,
+                        taskId: TaskId.generate(),
+                      );
+                      context
+                          .read<AddTodoBloc>()
+                          .add(AddTodoRequested(todoEntity: todo));
                     }
-                    // New entry `todo`
-                    final todo = TodoEntity(
-                      title: title,
-                      description: description,
-                      taskId: TaskId.generate(),
-                    );
-                    context
-                        .read<AddTodoBloc>()
-                        .add(AddTodoRequested(todoEntity: todo));
                   }
                 },
                 child: const Text('Save'),
