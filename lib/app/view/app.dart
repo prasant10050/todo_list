@@ -48,7 +48,7 @@ class App extends StatelessWidget {
       child: MaterialApp(
         theme: FlexThemeData.light(
           scheme: usedScheme,
-          appBarElevation: 0.5,
+          appBarElevation: 1,
           visualDensity: GlobalConfig.visualDensity,
           fontFamily: GlobalConfig.fontFamily,
           textTheme: GlobalConfig.textTheme,
@@ -57,7 +57,7 @@ class App extends StatelessWidget {
         // Same definition for the dark theme, but using FlexThemeData.dark().
         darkTheme: FlexThemeData.dark(
           scheme: usedScheme,
-          appBarElevation: 1,
+          appBarElevation: 1.5,
           visualDensity: GlobalConfig.visualDensity,
           fontFamily: GlobalConfig.fontFamily,
           textTheme: GlobalConfig.textTheme,

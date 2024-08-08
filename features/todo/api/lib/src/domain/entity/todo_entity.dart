@@ -30,12 +30,9 @@ class TodoEntity extends ValueObject<ValueFailure,TaskId>{
       'title': title,
       'description': description,
       'isCompleted': isCompleted,
-      'taskId': taskId,
+      'taskId': taskId.value.right,
     };
   }
-
-  @override
-  Either<ValueFailure, TaskId> get value => value;
 
   TodoEntity copyWith({
     String? title,
@@ -50,4 +47,7 @@ class TodoEntity extends ValueObject<ValueFailure,TaskId>{
       taskId: taskId ?? this.taskId,
     );
   }
+
+  @override
+  Either<ValueFailure, TaskId> get value => Right(TaskId());
 }

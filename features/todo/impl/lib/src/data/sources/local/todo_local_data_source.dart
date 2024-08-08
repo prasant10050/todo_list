@@ -1,23 +1,26 @@
+import 'dart:async';
+
 import 'package:data/data.dart';
-import 'package:domain/domain.dart';
-import 'package:domain/src/error/failure.dart';
-import 'package:either_dart/src/either.dart';
 import 'package:flutter/foundation.dart';
 import 'package:todo_api/api.dart';
-import 'package:todo_impl/src/domain/mapper/todo_mapper.dart';
 
 class TodoLocalDataSource implements ITodoDataSource {
   TodoLocalDataSource({required this.storage, required this.mapper});
 
   final BaseStorage<TodoEntity, TodoDto> storage;
-  final Mapper<TodoEntity,TodoDto> mapper;
+  final Mapper<TodoEntity, TodoDto> mapper;
+
+  StreamSubscription<Map<String, dynamic>>? subscription;
 
   @override
   Future<Either<Failure, TodoDto>> addTodo(TodoEntity todoEntity) async {
     try {
-      final id = await storage.put(todoEntity);
+      print("Items add: ${todoEntity.toMap()}");
+      final id = await storage.put(todoEntity.toMap());
+      print("Items add id: $id");
       final result = mapper.mapFromEntity(
-          todoEntity.copyWith(taskId: TaskId.fromUniqueString(id)));
+        todoEntity.copyWith(taskId: TaskId.fromUniqueString(id)),
+      );
       return Right(result);
     } catch (e) {
       debugPrint('AddTodo exception: $e');
@@ -28,7 +31,15 @@ class TodoLocalDataSource implements ITodoDataSource {
   @override
   Future<Either<Failure, List<TodoDto>>> getAllTodos() async {
     try {
-      final todoList = await storage.getAll();
+      final items = <String, TodoDto>{};
+      subscription = storage.getAllStreamValuesInMap().listen((event) {
+        print("Items event: ${event}");
+        final item = TodoDto.fromMap(event);
+        items.putIfAbsent(item.taskId, () => item);
+      });
+      print("Items: ${items.keys.length}");
+      final todoList =
+          items.entries.map((e) => TodoDto.fromMap).toList().cast<TodoDto>();
       return Right(todoList);
     } catch (e) {
       debugPrint('GetAllTodo exception: $e');

@@ -4,7 +4,8 @@ import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 class UpdateTodoBloc extends Bloc<TodoEvent, TodoState> {
-  UpdateTodoBloc({required this.updateTodoUsecase}) : super(TodoInitial()) {
+  UpdateTodoBloc({required this.updateTodoUsecase})
+      : super(const TodoInitial()) {
     // event: Update `todo`
     on<UpdateTodoRequested>(_handleUpdateTodo);
     on<OpenEditTodoDialogRequested>(_handleOpenEditTodoDialog);
@@ -27,9 +28,14 @@ class UpdateTodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
   Future<void> _handleOpenEditTodoDialog(
-      OpenEditTodoDialogRequested event,
-      Emitter<TodoState> emit,
-      ) async {
-    emit(OpenEditTodoDialogState(hasOpened: event.hasOpened));
+    OpenEditTodoDialogRequested event,
+    Emitter<TodoState> emit,
+  ) async {
+    emit(
+      OpenEditTodoDialogState(
+        hasOpened: event.hasOpened,
+        todoEntity: event.todoEntity,
+      ),
+    );
   }
 }

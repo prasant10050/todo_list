@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 extension TodoStateX on TodoState {
-  T map<T extends Object>({
+  T map<T>({
     required T Function(TodoLoading) loading,
     required T Function(TodoProcessing) processing,
     required T Function(TodoEmpty) empty,
@@ -62,7 +63,7 @@ extension TodoStateX on TodoState {
   }
 
   // mayBeMap
-  T mayBeMap<T extends Object>({
+  T mayBeMap<T>({
     required T Function() orElse, T Function(TodoLoading)? loading,
     T Function(TodoProcessing)? processing,
     T Function(TodoEmpty)? empty,
@@ -129,7 +130,7 @@ extension TodoStateX on TodoState {
     }
   }
 
-  T? mapOrNull<T extends Object>({
+  T? mapOrNull<T>({
     T Function(TodoLoading)? loading,
     T Function(TodoProcessing)? processing,
     T Function(TodoEmpty)? empty,
@@ -150,7 +151,6 @@ extension TodoStateX on TodoState {
     if (this is TodoLoading) {
       return loading?.call(this as TodoLoading);
     }
-    //
     else if (this is TodoProcessing) {
       return processing?.call(this as TodoProcessing);
     } else if (this is TodoFailure) {
@@ -160,7 +160,6 @@ extension TodoStateX on TodoState {
     } else if (this is RemoveTodoState) {
       return remove?.call(this as RemoveTodoState);
     }
-    //
     else if (this is RemoveAllTodoState) {
       return removeAll?.call(this as RemoveAllTodoState);
     } else if (this is GetTodoState) {

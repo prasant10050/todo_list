@@ -42,13 +42,13 @@ class TodoInMemoryDataSource implements ITodoDataSource {
       final defaultTodo = TodoDto(
         title: '',
         description: '',
-        taskId: TaskId.fromUniqueString(''),
+        taskId: '',
       );
       final result = _tasks.firstWhere(
         (element) => element.taskId == todoId,
         orElse: () => defaultTodo,
       );
-      if (result.taskId.getOrThrow().isEmpty) {
+      if (result.taskId.isEmpty) {
         return const Left(DatabaseFailure('Could not get todo: {}'));
       }
       return Right(result);

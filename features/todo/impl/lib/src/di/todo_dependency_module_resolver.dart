@@ -8,12 +8,12 @@ class TodoDependencyModuleResolver {
   static const String inMemory = 'in-memory';
   static const String local = 'local';
 
-  static void register({bool isMemory = false}) {
+  static void register({bool isMemory = true}) {
     _registerTodoDataDependencies(isMemory: isMemory);
     _registerTodoDomainDependencies(isMemory: isMemory);
   }
 
-  static void _registerTodoDataDependencies({bool isMemory = false}) {
+  static void _registerTodoDataDependencies({bool isMemory = true}) {
     // Mapper
     DependencyProvider.registerLazySingleton<Mapper<TodoEntity, TodoDto>>(
       TodoMapper.new,
@@ -51,7 +51,7 @@ class TodoDependencyModuleResolver {
     );
   }
 
-  static void _registerTodoDomainDependencies({bool isMemory = false}) {
+  static void _registerTodoDomainDependencies({bool isMemory = true}) {
     // UseCase
     DependencyProvider.registerLazySingleton<AddTodoUsecase>(
           ()=>AddTodoUsecase(

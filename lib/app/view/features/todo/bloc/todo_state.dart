@@ -1,16 +1,22 @@
 import 'package:equatable/equatable.dart';
 import 'package:todo_api/api.dart';
+import 'package:todo_list_app/app/common/todo_actions.dart';
 
 abstract class TodoState extends Equatable {
   const TodoState();
+
+  @override
+  List<Object?> get props => [];
 }
 
-final class TodoInitial extends TodoState {
+class TodoInitial extends TodoState {
+  const TodoInitial();
+
   @override
   List<Object> get props => [];
 }
 
-final class TodoLoading extends TodoState {
+class TodoLoading extends TodoState {
   const TodoLoading({this.isLoading = true});
 
   final bool isLoading;
@@ -19,7 +25,7 @@ final class TodoLoading extends TodoState {
   List<Object> get props => [isLoading];
 }
 
-final class TodoProcessing extends TodoState {
+class TodoProcessing extends TodoState {
   const TodoProcessing({this.isProcessing = true});
 
   final bool isProcessing;
@@ -28,7 +34,7 @@ final class TodoProcessing extends TodoState {
   List<Object> get props => [isProcessing];
 }
 
-final class TodoEmpty extends TodoState {
+class TodoEmpty extends TodoState {
   const TodoEmpty({this.message = 'Todo is empty'});
 
   final String message;
@@ -37,7 +43,7 @@ final class TodoEmpty extends TodoState {
   List<Object> get props => [message];
 }
 
-final class AddTodoSuccess extends TodoState {
+class AddTodoSuccess extends TodoState {
   const AddTodoSuccess({required this.todoEntity});
 
   final TodoEntity todoEntity;
@@ -46,7 +52,7 @@ final class AddTodoSuccess extends TodoState {
   List<Object> get props => [todoEntity];
 }
 
-final class TodoFailure extends TodoState {
+class TodoFailure extends TodoState {
   const TodoFailure({required this.message});
 
   final String message;
@@ -55,7 +61,7 @@ final class TodoFailure extends TodoState {
   List<Object> get props => [message];
 }
 
-final class RemoveTodoState extends TodoState {
+class RemoveTodoState extends TodoState {
   const RemoveTodoState({this.message = 'Todo remove successfully'});
 
   final String message;
@@ -64,7 +70,7 @@ final class RemoveTodoState extends TodoState {
   List<Object?> get props => [message];
 }
 
-final class RemoveAllTodoState extends TodoState {
+class RemoveAllTodoState extends TodoState {
   const RemoveAllTodoState({this.message = 'Remove all todo successfully'});
 
   final String message;
@@ -73,7 +79,7 @@ final class RemoveAllTodoState extends TodoState {
   List<Object?> get props => [message];
 }
 
-final class GetTodoState extends TodoState {
+class GetTodoState extends TodoState {
   const GetTodoState({required this.todoEntity});
 
   final TodoEntity todoEntity;
@@ -82,7 +88,7 @@ final class GetTodoState extends TodoState {
   List<Object?> get props => [todoEntity];
 }
 
-final class GetAllTodoState extends TodoState {
+class GetAllTodoState extends TodoState {
   const GetAllTodoState({this.todoEntities = const []});
 
   final List<TodoEntity> todoEntities;
@@ -91,7 +97,7 @@ final class GetAllTodoState extends TodoState {
   List<Object?> get props => [todoEntities];
 }
 
-final class MarkTodoState extends TodoState {
+class MarkTodoState extends TodoState {
   const MarkTodoState({
     required this.todoEntity,
   });
@@ -102,7 +108,7 @@ final class MarkTodoState extends TodoState {
   List<Object?> get props => [todoEntity];
 }
 
-final class UpdateTodoState extends TodoState {
+class UpdateTodoState extends TodoState {
   const UpdateTodoState({
     required this.todoEntity,
     this.message = 'Todo update successfully',
@@ -115,7 +121,7 @@ final class UpdateTodoState extends TodoState {
   List<Object?> get props => [todoEntity];
 }
 
-final class FilterTodoState extends TodoState {
+class FilterTodoState extends TodoState {
   const FilterTodoState({
     required this.filter,
     this.todoEntities = const [],
@@ -128,30 +134,43 @@ final class FilterTodoState extends TodoState {
   List<Object?> get props => [filter, todoEntities];
 }
 
-final class OpenAddTodoDialogState extends TodoState {
-  const OpenAddTodoDialogState({this.hasOpened=true});
+class OpenAddTodoDialogState extends TodoState {
+  const OpenAddTodoDialogState({this.hasOpened = true});
+
   final bool hasOpened;
+
   @override
   List<Object?> get props => [hasOpened];
 }
 
-final class DiscardTodoDialogState extends TodoState {
-  const DiscardTodoDialogState({this.hasDiscard=true});
+class DiscardTodoDialogState extends TodoState {
+  const DiscardTodoDialogState({this.hasDiscard = true});
+
   final bool hasDiscard;
+
   @override
   List<Object?> get props => [hasDiscard];
 }
 
-final class OpenEditTodoDialogState extends TodoState {
-  const OpenEditTodoDialogState({this.hasOpened=true});
+class OpenEditTodoDialogState extends TodoState {
+  const OpenEditTodoDialogState({
+    required this.todoEntity,
+    this.hasOpened = true,
+  });
+
   final bool hasOpened;
+  final TodoEntity todoEntity;
+
   @override
-  List<Object?> get props => [hasOpened];
+  List<Object?> get props => [hasOpened, todoEntity];
 }
 
-final class ShowTodoDetailsState extends TodoState {
-  const ShowTodoDetailsState({this.hasOpened=true});
+class ShowTodoDetailsState extends TodoState {
+  const ShowTodoDetailsState({required this.todoEntity,this.hasOpened = true});
+
   final bool hasOpened;
+  final TodoEntity todoEntity;
+
   @override
-  List<Object?> get props => [hasOpened];
+  List<Object?> get props => [hasOpened,todoEntity];
 }

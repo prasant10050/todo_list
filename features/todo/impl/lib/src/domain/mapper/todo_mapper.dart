@@ -6,7 +6,7 @@ class TodoMapper implements Mapper<TodoEntity, TodoDto> {
   TodoDto mapFromEntity(TodoEntity entity) => TodoDto(
         title: entity.title,
         description: entity.description,
-        taskId: entity.taskId,
+        taskId: entity.taskId.value.right,
         isCompleted: entity.isCompleted,
       );
 
@@ -14,7 +14,7 @@ class TodoMapper implements Mapper<TodoEntity, TodoDto> {
   TodoEntity mapToEntity(TodoDto dto) => TodoEntity(
         title: dto.title,
         description: dto.description,
-        taskId: dto.taskId,
+        taskId: TaskId.fromUniqueString(dto.taskId),
         isCompleted: dto.isCompleted,
       );
 }

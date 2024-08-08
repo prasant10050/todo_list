@@ -8,7 +8,7 @@ class RemoveTodoBloc extends Bloc<TodoEvent, TodoState> {
   RemoveTodoBloc({
     required this.removeTodoUsecase,
     required this.removeAllTodoUsecase,
-  }) : super(TodoInitial()) {
+  }) : super(const TodoInitial()) {
     on<RemoveTodoRequested>(_handleRemoveTodo);
     on<RemoveAllTodoRequested>(_handleRemoveAllTodos);
   }

@@ -1,14 +1,21 @@
-import 'package:di/di.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:multi_bloc_builder_widget/multi_bloc_builder.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_list_app/app/common/global_config.dart';
+import 'package:todo_list_app/app/common/screen_state_enum.dart';
 import 'package:todo_list_app/app/common/todo_actions.dart';
+import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc.dart';
+import 'package:todo_list_app/app/view/features/todo/bloc/filter_todo/filter_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
+import 'package:todo_list_app/app/view/features/todo/bloc/mark_todo/mark_todo_bloc.dart';
+import 'package:todo_list_app/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart';
+import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
-import 'package:todo_list_app/app/view/features/todo/widget/sliver_list_separator.dart';
+import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
+import 'package:todo_list_app/app/view/features/todo/extension/todo_state_extension.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_form.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_item.dart';
 import 'package:todo_list_app/app/widget/page_body.dart';
@@ -22,44 +29,67 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
   List<TodoEntity> todoEntities = [];
+  bool isTodoLoading = false;
+  bool isTodoProcessing = false;
+  bool hasTodoEmpty = false;
 
-  Widget _listWidget() {
-    final items = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  TodoListBuildPageState buildPageState = TodoListBuildPageState.loading;
 
-    return SliverListSeparator(
-      builder: (context, index) => ListTile(title: Text(items[index])),
-      separator: const Divider(),
-      childCount: items.length,
-    );
+  @override
+  void initState() {
+    super.initState();
+    context.read<GetTodoBloc>().add(const GetAllTodoRequested());
   }
 
-  Future<TodoEntity?> _openDialog(TodoId? todoId) {
+  void _fetchTodoList(BuildContext context) {
+    context.read<GetTodoBloc>().add(const GetAllTodoRequested());
+  }
+
+  Future<TodoEntity?> _openDialog(
+    TodoEntity? todoEntity,
+    TodoCallback? onEdit, {
+    bool isNew = true,
+    bool showMeDetails = false,
+  }) {
     return showDialog<TodoEntity>(
       context: context,
+      barrierDismissible: false,
       builder: (context) => TodoForm(
-        key: todoId != null ? ValueKey(todoId) : UniqueKey(),
+        key: todoEntity?.taskId != null ? ValueKey(todoEntity) : UniqueKey(),
+        todoEntity: todoEntity,
+        isNew: isNew,
+        onEdit: onEdit,
+        showMeDetails: showMeDetails,
       ),
     );
   }
 
-  void _editTodo(TodoEntity todo) {
-    // Implement edit functionality
+  void _editTodo(
+    TodoEntity todo,
+  ) {
+    context
+        .read<UpdateTodoBloc>()
+        .add(OpenEditTodoDialogRequested(todoEntity: todo));
   }
 
   void _markAsDone(TodoEntity todo) {
-    setState(() {
-      //todo.isDone = !todo.isDone;
-    });
+    context.read<MarkTodoBloc>().add(
+          MarkTodoRequested(
+            todoEntity: todo.copyWith(isCompleted: !todo.isCompleted),
+          ),
+        );
   }
 
   void _showDetails(TodoEntity todo) {
-    // Implement show details functionality
+    context.read<GetTodoBloc>().add(
+           ShowTodoDetailsRequested(todoEntity: todo),
+        );
   }
 
   void _deleteTodo(TodoEntity todo) {
-    setState(() {
-      //todos.remove(todo);
-    });
+    context.read<RemoveTodoBloc>().add(
+      RemoveTodoRequested(taskId: todo.taskId),
+    );
   }
 
   @override
@@ -75,25 +105,94 @@ class _TodoListPageState extends State<TodoListPage> {
       value: FlexColorScheme.themedSystemNavigationBar(
         context,
         useDivider: false,
-        opacity: 0.60,
-        noAppBar: true,
       ),
       child: Scaffold(
-          appBar: AppBar(
-            title: const Text('My Todo List'),
-            actions: const [],
+        appBar: AppBar(
+          title: const Text('My Todo List'),
+          actions: const [],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.read<AddTodoBloc>().add(
+                  const OpenAddTodoDialogRequested(),
+                );
+            return;
+          },
+          child: const Icon(Icons.add),
+        ),
+        body: PageBody(
+          controller: ScrollController(),
+          constraints: BoxConstraints(
+            minWidth: double.infinity,
+            minHeight: media.size.height,
           ),
-          body: PageBody(
-            controller: ScrollController(),
-            constraints: BoxConstraints(
-              minWidth: double.infinity,
-              minHeight: media.size.height,
-            ),
-            child: BlocBuilder<GetTodoBloc, TodoState>(
-              bloc: context.read<GetTodoBloc>(),
-              buildWhen: (previous, current) => previous != current,
-              builder: (context, todoState) {
-                
+          child: MultiBlocListener(
+            listeners: [
+              BlocListener<GetTodoBloc, TodoState>(
+                listener: (context, todoState) {
+                  return _listenState(todoState, context);
+                },
+              ),
+              BlocListener<AddTodoBloc, TodoState>(
+                listener: (context, todoState) {
+                  return _listenState(todoState, context);
+                },
+              ),
+              BlocListener<RemoveTodoBloc, TodoState>(
+                listener: (context, todoState) {
+                  return _listenState(todoState, context);
+                },
+              ),
+              BlocListener<MarkTodoBloc, TodoState>(
+                listener: (context, todoState) {
+                  return _listenState(todoState, context);
+                },
+              ),
+              BlocListener<UpdateTodoBloc, TodoState>(
+                listener: (context, todoState) {
+                  return _listenState(todoState, context);
+                },
+              ),
+              BlocListener<FilterTodoBloc, TodoState>(
+                listener: (context, todoState) {
+                  return _listenState(todoState, context);
+                },
+              ),
+            ],
+            child: MultiBlocBuilder(
+              blocs: [
+                context.read<GetTodoBloc>(),
+                context.read<AddTodoBloc>(),
+                context.read<RemoveTodoBloc>(),
+                context.read<MarkTodoBloc>(),
+                context.read<UpdateTodoBloc>(),
+                context.read<FilterTodoBloc>(),
+              ],
+              builder: (context, states) {
+                final todoState = states.get<TodoState>()
+                  ..mayBeMap(
+                    orElse: () {},
+                    getAll: (state) {
+                      buildPageState = TodoListBuildPageState.loaded;
+                      todoEntities =
+                          List<TodoEntity>.from(state.todoEntities.toList());
+                    },
+                    removeAll: (state) {
+                      buildPageState = TodoListBuildPageState.empty;
+                    },
+                    filterAll: (state) {
+                      buildPageState = TodoListBuildPageState.loaded;
+                      todoEntities =
+                          List<TodoEntity>.from(state.todoEntities.toList());
+                    },
+                    empty: (state) {
+                      buildPageState = TodoListBuildPageState.empty;
+                    },
+                    loading: (state) {
+                      isTodoLoading = state.isLoading;
+                      buildPageState = TodoListBuildPageState.loading;
+                    },
+                  );
                 return SingleChildScrollView(
                   child: Container(
                     constraints: BoxConstraints(
@@ -114,30 +213,38 @@ class _TodoListPageState extends State<TodoListPage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(
-                          child: CustomScrollView(
-                            slivers: [
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    final todo = todoEntities[index];
-
-                                    final todoActions = TodoActions(
-                                      onEdit: _editTodo,
-                                      onMarkAsDone: _markAsDone,
-                                      onShowDetails: _showDetails,
-                                      onDelete: _deleteTodo,
-                                    );
-
-                                    return TodoItem(
-                                      todoEntity: todo,
-                                      actions: todoActions,
-                                    );
-                                  },
-                                  childCount: todoEntities.length,
-                                ),
+                          child: switch (buildPageState) {
+                            TodoListBuildPageState.loading => const Center(
+                                child: CircularProgressIndicator(),
                               ),
-                            ],
-                          ),
+                            TodoListBuildPageState.empty => const Center(
+                                child: Text('Empty'),
+                              ),
+                            _ => CustomScrollView(
+                                slivers: [
+                                  SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        final todo = todoEntities[index];
+
+                                        final todoActions = TodoActions(
+                                          onEdit: _editTodo,
+                                          onMarkAsDone: _markAsDone,
+                                          onShowDetails: _showDetails,
+                                          onDelete: _deleteTodo,
+                                        );
+
+                                        return TodoItem(
+                                          todoEntity: todo,
+                                          actions: todoActions,
+                                        );
+                                      },
+                                      childCount: todoEntities.length,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          },
                         ),
                       ],
                     ),
@@ -145,7 +252,68 @@ class _TodoListPageState extends State<TodoListPage> {
                 );
               },
             ),
-          )),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _listenState(TodoState todoState, BuildContext context) {
+    return todoState.mapOrNull(
+      error: (state) {},
+      openAddTodoDialog: (state) {
+        if (!state.hasOpened) {
+          Navigator.of(context).pop();
+        } else {
+          Future.delayed(
+            Durations.short2,
+            () async => _openDialog(null, null),
+          );
+        }
+      },
+      openEditTodoDialog: (state) {
+        if (!state.hasOpened) {
+          Navigator.of(context).pop();
+        } else {
+          Future.delayed(
+            Durations.short2,
+            () async => _openDialog(state.todoEntity, null, isNew: false),
+          );
+        }
+      },
+      discardTodo: (state) {
+        Navigator.of(context).pop();
+      },
+      todoDetails: (state) {
+        if (!state.hasOpened) {
+          Navigator.of(context).pop();
+        } else {
+          Future.delayed(
+            Durations.short2,
+            () async => _openDialog(
+              state.todoEntity,
+              null,
+              isNew: false,
+              showMeDetails: true,
+            ),
+          );
+        }
+      },
+      processing: (state) {
+        isTodoProcessing = state.isProcessing;
+      },
+      addTodo: (state) {
+        _fetchTodoList(context);
+      },
+      markAsDone: (state) {
+        _fetchTodoList(context);
+      },
+      remove: (state) {
+        _fetchTodoList(context);
+      },
+      updateTodo: (state) {
+        _fetchTodoList(context);
+      },
     );
   }
 }

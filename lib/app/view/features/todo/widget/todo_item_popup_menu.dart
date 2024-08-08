@@ -20,7 +20,7 @@ class TodoItemPopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final animationStyle = AnimationStyle(
       curve: Easing.emphasizedDecelerate,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     );
     return PopupMenuButton<Menu>(
       popUpAnimationStyle: animationStyle,
@@ -51,7 +51,7 @@ class TodoItemPopupMenu extends StatelessWidget {
           value: Menu.edit,
           child: ListTile(
             leading: Icon(Icons.edit),
-            title: Text('Remove'),
+            title: Text('Edit'),
           ),
         ),
         const PopupMenuDivider(),
@@ -59,7 +59,7 @@ class TodoItemPopupMenu extends StatelessWidget {
           value: Menu.remove,
           child: ListTile(
             leading: Icon(Icons.delete),
-            title: Text('Download'),
+            title: Text('Remove'),
           ),
         ),
       ],

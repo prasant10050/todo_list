@@ -6,7 +6,7 @@ import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
   GetTodoBloc({required this.getAllTodoUsecase, required this.getTodoUsecase})
-      : super(TodoInitial()) {
+      : super(const TodoInitial()) {
     on<GetTodoRequested>(_handleGetTodo);
     on<GetAllTodoRequested>(_handleGetAllTodos);
     on<ShowTodoDetailsRequested>(_handleShowTodoDetails);
@@ -48,7 +48,7 @@ class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
     final result = await usecase();
     emit(const TodoLoading(isLoading: false));
 
-    result.fold(
+    return result.fold(
       (left) {
         emit(TodoFailure(message: (left as Failure).message));
       },
@@ -60,6 +60,7 @@ class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
     ShowTodoDetailsRequested event,
     Emitter<TodoState> emit,
   ) async {
-    emit(ShowTodoDetailsState(hasOpened: event.hasOpened));
+    emit(ShowTodoDetailsState(
+        hasOpened: event.hasOpened, todoEntity: event.todoEntity,),);
   }
 }

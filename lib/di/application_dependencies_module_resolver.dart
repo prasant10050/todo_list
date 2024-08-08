@@ -11,16 +11,16 @@ class ApplicationDependenciesModuleResolver {
   static const String inMemory = 'in-memory';
   static const String local = 'local';
 
-  static void register({bool isMemory = false}) {
+  static void register({bool isMemory = true}) {
     _registerFeatures(isMemory: isMemory);
     _registerBlocProviders(isMemory: isMemory);
   }
 
-  static void _registerFeatures({bool isMemory = false}) {
+  static void _registerFeatures({bool isMemory = true}) {
     TodoDependencyModuleResolver.register(isMemory: isMemory);
   }
 
-  static Future<void> _registerBlocProviders({bool isMemory = false}) async {
+  static Future<void> _registerBlocProviders({bool isMemory = true}) async {
     DependencyProvider.registerFactory<AddTodoBloc>(
       () => AddTodoBloc(
         addTodoUsecase: DependencyProvider.get<AddTodoUsecase>(

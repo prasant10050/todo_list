@@ -14,14 +14,14 @@ class TodoDto{
       title: map['title'] as String,
       description: map['description'] as String,
       isCompleted: map['isCompleted'] as bool,
-      taskId: map['taskId'] as TaskId,
+      taskId: map['taskId'] as String,
     );
   }
 
   final String title;
   final String description;
   final bool isCompleted;
-  final TaskId taskId;
+  final String taskId;
 
   Map<String, dynamic> toMap() {
     return {
@@ -36,7 +36,7 @@ class TodoDto{
     String? title,
     String? description,
     bool? isCompleted,
-    TaskId? taskId,
+    String? taskId,
   }) {
     return TodoDto(
       title: title ?? this.title,

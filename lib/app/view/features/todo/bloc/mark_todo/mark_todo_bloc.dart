@@ -4,7 +4,7 @@ import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 class MarkTodoBloc extends Bloc<TodoEvent, TodoState> {
-  MarkTodoBloc({required this.markTodoUsecase}) : super(TodoInitial()) {
+  MarkTodoBloc({required this.markTodoUsecase}) : super(const TodoInitial()) {
     // event: Mark done or not done `todo`
     on<MarkTodoRequested>(_handleMarkTodo);
   }

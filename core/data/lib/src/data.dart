@@ -3,7 +3,7 @@ import 'package:localstore/localstore.dart';
 abstract class BaseStorage<T, R> {
   Future<T?> getByKey(String id, {T? defaultValue});
 
-  Future<String> put(T entity);
+  Future<String> put(Map<String,dynamic> entity);
 
   Future<void> delete(String id);
 
@@ -60,21 +60,18 @@ class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
   }
 
   @override
-  Future<String> put(T entity) async {
-    if (T is Map<String, dynamic>) {
+  Future<String> put( Map<String, dynamic> entity) async {
       // gets new id
       final id = _db.collection(_path).doc().id;
       // save the item
       await _db.collection(_path).doc(id).set(entity as Map<String, dynamic>);
       return id;
-    } else {
-      throw Exception('Type is not supported');
-    }
+
   }
 
   @override
   Stream<Map<String, dynamic>> getAllStreamValuesInMap() async* {
-    yield* _db.collection(_path).stream;
+    yield* _db.collection(_path).stream.asBroadcastStream();
   }
 
   @override
