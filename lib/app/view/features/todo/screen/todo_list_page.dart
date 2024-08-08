@@ -2,6 +2,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_list_app/app/common/global_config.dart';
 import 'package:todo_list_app/app/common/screen_state_enum.dart';
@@ -17,6 +18,7 @@ import 'package:todo_list_app/app/view/features/todo/extension/todo_state_extens
 import 'package:todo_list_app/app/view/features/todo/widget/todo_filter_widget.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_form.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_item.dart';
+import 'package:todo_list_app/app/widget/gradientText.dart';
 import 'package:todo_list_app/app/widget/page_body.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -31,6 +33,8 @@ class _TodoListPageState extends State<TodoListPage> {
   bool isTodoLoading = false;
   bool isTodoProcessing = false;
   bool hasTodoEmpty = false;
+  var countTotalTodo = 1;
+  var countCompletedTodo = 0;
 
   TodoListBuildPageState buildPageState = TodoListBuildPageState.loading;
 
@@ -113,8 +117,35 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('My Todo List'),
-          actions: const [],
+          title: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: 1),
+                child: SizedBox(
+                  height: 45,
+                  width: 45,
+                  // margin: EdgeInsets.only(left: .0.wp),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset('assets/images/robo_avatar.png'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GradientText(
+                'ToDo - Prasant',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                gradient: const LinearGradient(colors: [
+                  Color.fromARGB(255, 59, 67, 88),
+                  Color.fromARGB(255, 90, 69, 69),
+                ],),
+              ),
+            ],
+          ),
+          actions: [],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -170,9 +201,16 @@ class _TodoListPageState extends State<TodoListPage> {
                     buildPageState = TodoListBuildPageState.loaded;
                     todoEntities =
                         List<TodoEntity>.from(state.todoEntities.toList());
+                    countTotalTodo = todoEntities.length;
+                    countCompletedTodo = todoEntities
+                        .where((task) => task.isCompleted)
+                        .toList()
+                        .length;
                   },
                   removeAll: (state) {
                     buildPageState = TodoListBuildPageState.empty;
+                    countTotalTodo = todoEntities.length;
+                    countCompletedTodo = 0;
                   },
                   filterAll: (state) {
                     buildPageState = TodoListBuildPageState.loaded;
@@ -187,6 +225,7 @@ class _TodoListPageState extends State<TodoListPage> {
                     buildPageState = TodoListBuildPageState.loading;
                   },
                 );
+
                 return SingleChildScrollView(
                   child: Container(
                     constraints: BoxConstraints(
@@ -208,6 +247,39 @@ class _TodoListPageState extends State<TodoListPage> {
                       children: [
                         TodoFilterWidget(
                           onFilter: _filterTodo,
+                        ),
+                        const Divider(),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(
+                              start: 16, end: 16, top: 8, bottom: 8,),
+                          child: Row(
+                            children: [
+                              Text(
+                                '$countCompletedTodo of $countTotalTodo Tasks',
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: StepProgressIndicator(
+                                  totalSteps: countTotalTodo,
+                                  currentStep: countCompletedTodo,
+                                  size: 16,
+                                  padding: 0,
+                                  roundedEdges: const Radius.circular(10),
+                                  selectedGradientColor: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [theme.colorScheme.surfaceTint.withOpacity(0.5), theme.colorScheme.surfaceTint],
+                                  ),
+                                  unselectedGradientColor: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [theme.colorScheme.inversePrimary, theme.colorScheme.inversePrimary],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const Divider(),
                         Expanded(

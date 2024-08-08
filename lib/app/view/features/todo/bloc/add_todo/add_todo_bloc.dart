@@ -17,8 +17,6 @@ class AddTodoBloc extends Bloc<TodoEvent, TodoState> {
     AddTodoRequested event,
     Emitter<TodoState> emit,
   ) async {
-    emit(const OpenAddTodoDialogState(hasOpened: false));
-    await Future.delayed(Durations.medium2, () {});
     emit(const TodoProcessing());
     final result = await addTodoUsecase(event.todoEntity);
     emit(const TodoProcessing(isProcessing: false));
