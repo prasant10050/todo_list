@@ -1,6 +1,5 @@
 import 'package:data/data.dart';
 import 'package:di/di.dart';
-import 'package:domain/domain.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_impl/impl.dart';
 
@@ -8,40 +7,46 @@ class TodoDependencyModuleResolver {
   static const String inMemory = 'in-memory';
   static const String local = 'local';
 
-  static void register({bool isMemory = true}) {
-    _registerTodoDataDependencies(isMemory: isMemory);
+  static Future<void> register({bool isMemory = true}) async {
+    await _registerTodoDataDependencies(isMemory: isMemory);
     _registerTodoDomainDependencies(isMemory: isMemory);
   }
 
-  static void _registerTodoDataDependencies({bool isMemory = true}) {
+  static Future<void> _registerTodoDataDependencies({
+    bool isMemory = true,
+  }) async {
     // Mapper
     DependencyProvider.registerLazySingleton<Mapper<TodoEntity, TodoDto>>(
       TodoMapper.new,
     );
 
     // Local Storage
-    DependencyProvider.registerLazySingleton<BaseStorage<TodoEntity, TodoDto>>(
-      SecureLocalStorage.new,
+    DependencyProvider.registerLazySingleton<BaseStorage>(
+      LocalSembastDataDao.new,
     );
 
     // Data Sources
+
+    // Inject local sembast database
+    //await LocalSembastDatabase.instance.database;
+
     DependencyProvider.registerLazySingleton<ITodoDataSource>(
-      ()=>TodoInMemoryDataSource(
+      () => TodoInMemoryDataSource(
         mapper: DependencyProvider.get<Mapper<TodoEntity, TodoDto>>(),
       ),
       instanceName: inMemory,
     );
     DependencyProvider.registerLazySingleton<ITodoDataSource>(
-          ()=>TodoLocalDataSource(
+      () => TodoLocalDataSource(
         mapper: DependencyProvider.get<Mapper<TodoEntity, TodoDto>>(),
-        storage: DependencyProvider.get<BaseStorage<TodoEntity, TodoDto>>(),
+        storage: DependencyProvider.get<BaseStorage>(),
       ),
       instanceName: local,
     );
 
     // Repository
     DependencyProvider.registerLazySingleton<ITodoRepository>(
-          ()=>TodoRepository(
+      () => TodoRepository(
         dataSource: DependencyProvider.get<ITodoDataSource>(
           instanceName: isMemory ? inMemory : local,
         ),
@@ -54,7 +59,7 @@ class TodoDependencyModuleResolver {
   static void _registerTodoDomainDependencies({bool isMemory = true}) {
     // UseCase
     DependencyProvider.registerLazySingleton<AddTodoUsecase>(
-          ()=>AddTodoUsecase(
+      () => AddTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
@@ -62,7 +67,7 @@ class TodoDependencyModuleResolver {
       instanceName: isMemory ? inMemory : local,
     );
     DependencyProvider.registerLazySingleton<GetAllTodoUsecase>(
-          ()=>GetAllTodoUsecase(
+      () => GetAllTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),
@@ -78,7 +83,7 @@ class TodoDependencyModuleResolver {
       instanceName: isMemory ? inMemory : local,
     );
     DependencyProvider.registerLazySingleton<GetTodoUsecase>(
-          ()=>GetTodoUsecase(
+      () => GetTodoUsecase(
         DependencyProvider.get<ITodoRepository>(
           instanceName: isMemory ? inMemory : local,
         ),

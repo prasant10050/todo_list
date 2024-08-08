@@ -7,16 +7,16 @@ import 'package:todo_api/api.dart';
 class TodoLocalDataSource implements ITodoDataSource {
   TodoLocalDataSource({required this.storage, required this.mapper});
 
-  final BaseStorage<TodoEntity, TodoDto> storage;
+  final BaseStorage storage;
   final Mapper<TodoEntity, TodoDto> mapper;
 
   @override
   Future<Either<Failure, TodoDto>> addTodo(TodoEntity todoEntity) async {
     try {
-      final newTaskId = storage.getNewId;
+      final newTaskId = TaskId.generate();
       final copyEntity =
-          todoEntity.copyWith(taskId: TaskId.fromUniqueString(newTaskId));
-      await storage.put(newTaskId, copyEntity.toMap());
+          todoEntity.copyWith(taskId: newTaskId);
+      await storage.put(newTaskId.value, copyEntity.toMap());
       final result = mapper.mapFromEntity(copyEntity);
       return Right(result);
     } catch (e) {
@@ -52,7 +52,7 @@ class TodoLocalDataSource implements ITodoDataSource {
       if (todo == null) {
         return const Left(DatabaseFailure('Could not get todo: {}'));
       }
-      final result = mapper.mapFromEntity(todo);
+      final result = TodoDto.fromMap(todo as Map<String,dynamic>);
       return Right(result);
     } catch (e) {
       debugPrint('GetTodo exception: $e');

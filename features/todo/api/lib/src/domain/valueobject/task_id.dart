@@ -6,7 +6,7 @@ class TaskId extends ValueObject<String> {
   // We cannot let a simple String be passed in. This would allow for possible non-unique IDs.
   factory TaskId() {
     return TaskId._(
-      const Uuid().v1(),
+      const Uuid().v4(),
     );
   }
 

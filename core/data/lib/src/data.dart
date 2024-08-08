@@ -1,13 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:localstore/localstore.dart';
 
-abstract class BaseStorage<T, R> {
-  Future<T?> getByKey(String id, {T? defaultValue});
+abstract class BaseStorage {
+  Future<dynamic> getByKey(String id, {dynamic defaultValue});
 
-  Future<void> put(String id, Map<String, dynamic> entity);
+  Future<dynamic> put(String id, Map<String, dynamic> entity);
 
   Future<void> delete(String id);
 
-  Future<List<R>> getAll();
+  Future<List<dynamic>> getAll();
 
   Future<void> clear();
 
@@ -17,10 +18,11 @@ abstract class BaseStorage<T, R> {
 
   Future<void> update(String id, Map<String, dynamic> entity);
 
+  @protected
   String get getNewId;
 }
 
-class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
+class SecureLocalStorage implements BaseStorage {
   final _db = Localstore.instance;
   final String _path = 'todos';
 
@@ -48,7 +50,7 @@ class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
   }
 
   @override
-  Future<List<R>> getAll() async {
+  Future<List<dynamic>> getAll() async {
     throw UnimplementedError();
   }
 
@@ -59,9 +61,9 @@ class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
   }
 
   @override
-  Future<T?> getByKey(String id, {T? defaultValue}) async {
+  Future<dynamic> getByKey(String id, {dynamic defaultValue}) async {
     final data = await _db.collection(_path).doc(id).get();
-    return data as T ?? defaultValue;
+    return data ?? defaultValue;
   }
 
   @override
