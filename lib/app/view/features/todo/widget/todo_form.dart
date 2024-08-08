@@ -59,7 +59,9 @@ class _TodoFormState extends State<TodoForm> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('${widget.isNew ? 'Add' : 'Edit'} todo'),
+      title: widget.showMeDetails
+          ? const Text('Todo details')
+          : Text('${widget.isNew ? 'Add' : 'Edit'} todo'),
       content: Form(
         key: _formKey,
         child: Column(

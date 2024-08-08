@@ -2,13 +2,11 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:multi_bloc_builder_widget/multi_bloc_builder.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_list_app/app/common/global_config.dart';
 import 'package:todo_list_app/app/common/screen_state_enum.dart';
 import 'package:todo_list_app/app/common/todo_actions.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc.dart';
-import 'package:todo_list_app/app/view/features/todo/bloc/filter_todo/filter_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/mark_todo/mark_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart';
@@ -19,7 +17,6 @@ import 'package:todo_list_app/app/view/features/todo/extension/todo_state_extens
 import 'package:todo_list_app/app/view/features/todo/widget/todo_filter_widget.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_form.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_item.dart';
-import 'package:todo_list_app/app/widget/multiple_bloc_builder_widget.dart';
 import 'package:todo_list_app/app/widget/page_body.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -88,11 +85,9 @@ class _TodoListPageState extends State<TodoListPage> {
         );
   }
 
-  void _filterTodo(Filter filter){
-    if(context.mounted) {
-      context
-          .read<GetTodoBloc>()
-          .add( FilterTodoRequested(filter: filter));
+  void _filterTodo(Filter filter) {
+    if (context.mounted) {
+      context.read<GetTodoBloc>().add(FilterTodoRequested(filter: filter));
     }
   }
 
@@ -163,34 +158,26 @@ class _TodoListPageState extends State<TodoListPage> {
                   return _listenState(todoState, context);
                 },
               ),
-              BlocListener<FilterTodoBloc, TodoState>(
-                listener: (context, todoState) {
-                  return _listenState(todoState, context);
-                },
-              ),
             ],
-            child: BlocBuilder<
-                GetTodoBloc,
-                TodoState>(
-              buildWhen: (previous, current) => previous!=current,
+            child: BlocBuilder<GetTodoBloc, TodoState>(
+              buildWhen: (previous, current) => previous != current,
               builder: (context, state) {
                 state.mayBeMap(
                   orElse: () {
-                    buildPageState = TodoListBuildPageState.empty;
-                    todoEntities=[];
+                    buildPageState = TodoListBuildPageState.loaded;
                   },
                   getAll: (state) {
                     buildPageState = TodoListBuildPageState.loaded;
-                    todoEntities = List<TodoEntity>.from(
-                        state.todoEntities.toList());
+                    todoEntities =
+                        List<TodoEntity>.from(state.todoEntities.toList());
                   },
                   removeAll: (state) {
                     buildPageState = TodoListBuildPageState.empty;
                   },
                   filterAll: (state) {
                     buildPageState = TodoListBuildPageState.loaded;
-                    todoEntities = List<TodoEntity>.from(
-                        state.todoEntities.toList());
+                    todoEntities =
+                        List<TodoEntity>.from(state.todoEntities.toList());
                   },
                   empty: (state) {
                     buildPageState = TodoListBuildPageState.empty;
@@ -219,40 +206,42 @@ class _TodoListPageState extends State<TodoListPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                         TodoFilterWidget(onFilter: _filterTodo,),
+                        TodoFilterWidget(
+                          onFilter: _filterTodo,
+                        ),
                         const Divider(),
                         Expanded(
                           child: switch (buildPageState) {
                             TodoListBuildPageState.loading => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                                child: CircularProgressIndicator(),
+                              ),
                             TodoListBuildPageState.empty => const Center(
-                              child: Text('Empty'),
-                            ),
+                                child: Text('Empty'),
+                              ),
                             _ => CustomScrollView(
-                              slivers: [
-                                SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                        (context, index) {
-                                      final todo = todoEntities[index];
+                                slivers: [
+                                  SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        final todo = todoEntities[index];
 
-                                      final todoActions = TodoActions(
-                                        onEdit: _editTodo,
-                                        onMarkAsDone: _markAsDone,
-                                        onShowDetails: _showDetails,
-                                        onDelete: _deleteTodo,
-                                      );
+                                        final todoActions = TodoActions(
+                                          onEdit: _editTodo,
+                                          onMarkAsDone: _markAsDone,
+                                          onShowDetails: _showDetails,
+                                          onDelete: _deleteTodo,
+                                        );
 
-                                      return TodoItem(
-                                        todoEntity: todo,
-                                        actions: todoActions,
-                                      );
-                                    },
-                                    childCount: todoEntities.length,
+                                        return TodoItem(
+                                          todoEntity: todo,
+                                          actions: todoActions,
+                                        );
+                                      },
+                                      childCount: todoEntities.length,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                           },
                         ),
                       ],

@@ -15,16 +15,6 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).listTileTheme.titleTextStyle?.copyWith(
-          decoration:
-              todoEntity.isCompleted ? TextDecoration.lineThrough : null,
-        );
-
-    final subTitleStyle =
-        Theme.of(context).listTileTheme.subtitleTextStyle?.copyWith(
-              decoration:
-                  todoEntity.isCompleted ? TextDecoration.lineThrough : null,
-            );
 
     return Card(
       margin: const EdgeInsetsDirectional.only(
@@ -37,14 +27,17 @@ class TodoItem extends StatelessWidget {
         ),
         title: Text(
           todoEntity.title,
+          style: TextStyle(
+            decoration: todoEntity.isCompleted ? TextDecoration.lineThrough : null,
+          ),
           //style: titleStyle,
         ),
-        titleTextStyle: titleStyle,
         subtitle: Text(
           todoEntity.description,
-          style: subTitleStyle,
+          style: TextStyle(
+            decoration: todoEntity.isCompleted ? TextDecoration.lineThrough : null,
+          ),
         ),
-        subtitleTextStyle: subTitleStyle,
         leading: Checkbox(
           value: todoEntity.isCompleted,
           onChanged: (value) => actions.onMarkAsDone(todoEntity),
