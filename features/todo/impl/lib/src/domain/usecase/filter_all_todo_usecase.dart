@@ -1,14 +1,14 @@
-import 'package:domain/domain.dart';
 import 'package:todo_api/api.dart';
+import 'package:todo_impl/impl.dart';
 
 class FilterAllTodoUsecase extends IFilterAllTodoUsecase {
   FilterAllTodoUsecase({required this.getAllTodoUsecase});
 
-  final IGetAllTodoUsecase getAllTodoUsecase;
+  final GetAllTodoUsecase getAllTodoUsecase;
 
   @override
-  Future<Either<Failure, List<TodoEntity>>> call(Filter params) {
-    return getAllTodoUsecase().fold(
+  Future<Either<Failure, List<TodoEntity>>> call(Filter params) async{
+    return getAllTodoUsecase.call().fold(
       Left.new,
       (data) {
         switch (params) {

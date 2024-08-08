@@ -5,15 +5,20 @@ import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
-  GetTodoBloc({required this.getAllTodoUsecase, required this.getTodoUsecase})
-      : super(const TodoInitial()) {
+  GetTodoBloc({
+    required this.getAllTodoUsecase,
+    required this.getTodoUsecase,
+    required this.filterAllTodoUsecase,
+  }) : super(const TodoInitial()) {
     on<GetTodoRequested>(_handleGetTodo);
     on<GetAllTodoRequested>(_handleGetAllTodos);
     on<ShowTodoDetailsRequested>(_handleShowTodoDetails);
+    on<FilterTodoRequested>(_handleFilterAllTodos);
   }
 
   final GetTodoUsecase getTodoUsecase;
   final GetAllTodoUsecase getAllTodoUsecase;
+  final FilterAllTodoUsecase filterAllTodoUsecase;
 
   Future<void> _handleGetTodo(
     GetTodoRequested event,
@@ -60,7 +65,24 @@ class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
     ShowTodoDetailsRequested event,
     Emitter<TodoState> emit,
   ) async {
-    emit(ShowTodoDetailsState(
-        hasOpened: event.hasOpened, todoEntity: event.todoEntity,),);
+    emit(
+      ShowTodoDetailsState(
+        hasOpened: event.hasOpened,
+        todoEntity: event.todoEntity,
+      ),
+    );
+  }
+
+  Future<void> _handleFilterAllTodos(
+    FilterTodoRequested event,
+    Emitter<TodoState> emit,
+  ) async {
+    await _execute<Failure, List<TodoEntity>>(
+      emit,
+      () => filterAllTodoUsecase(event.filter),
+      (right) => right.isEmpty
+          ? const TodoEmpty()
+          : FilterTodoState(todoEntities: right.toList(), filter: event.filter),
+    );
   }
 }

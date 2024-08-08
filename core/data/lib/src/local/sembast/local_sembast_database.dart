@@ -150,6 +150,5 @@ class LocalSembastDataDao implements BaseStorage {
     map=entity;
     await _todoStore.record(id).put(await _db, map, merge: true);
     final updatedRecord=await getByKey(id) as Map<String,dynamic>;
-    print('Updated record: $updatedRecord');
   }
 }

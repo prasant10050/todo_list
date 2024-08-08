@@ -26,10 +26,6 @@ class TodoDependencyModuleResolver {
     );
 
     // Data Sources
-
-    // Inject local sembast database
-    //await LocalSembastDatabase.instance.database;
-
     DependencyProvider.registerLazySingleton<ITodoDataSource>(
       () => TodoInMemoryDataSource(
         mapper: DependencyProvider.get<Mapper<TodoEntity, TodoDto>>(),

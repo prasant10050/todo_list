@@ -43,6 +43,9 @@ class ApplicationDependenciesModuleResolver {
         getAllTodoUsecase: DependencyProvider.get<GetAllTodoUsecase>(
           instanceName: isMemory ? inMemory : local,
         ),
+        filterAllTodoUsecase: DependencyProvider.get<FilterAllTodoUsecase>(
+          instanceName: isMemory ? inMemory : local,
+        ),
       ),
     );
     DependencyProvider.registerFactory<MarkTodoBloc>(

@@ -79,7 +79,6 @@ class SecureLocalStorage implements BaseStorage {
 
   @override
   Future<void> update(String id, Map<String, dynamic> entity) async {
-    print('Update date:${entity}');
     await _db
         .collection(_path)
         .doc(id)

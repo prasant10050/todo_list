@@ -1,11 +1,13 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_impl/impl.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 class FilterTodoBloc extends Bloc<TodoEvent, TodoState> {
-  FilterTodoBloc({required this.filterAllTodoUsecase}) : super(const TodoInitial()) {
+  FilterTodoBloc({required this.filterAllTodoUsecase})
+      : super(const TodoInitial()) {
     on<FilterTodoRequested>(_handleFilterAllTodos);
   }
 
@@ -19,7 +21,7 @@ class FilterTodoBloc extends Bloc<TodoEvent, TodoState> {
       emit,
       () => filterAllTodoUsecase(event.filter),
       (right) => right.isEmpty
-          ?  const TodoEmpty()
+          ? const TodoEmpty()
           : FilterTodoState(todoEntities: right.toList(), filter: event.filter),
     );
   }
@@ -29,11 +31,11 @@ class FilterTodoBloc extends Bloc<TodoEvent, TodoState> {
     Future<Either<L, R>> Function() usecase,
     TodoState Function(R) onSuccess,
   ) async {
-    emit( const TodoLoading());
+    emit(const TodoLoading());
     final result = await usecase();
-    emit( const TodoLoading(isLoading: false));
+    emit(const TodoLoading(isLoading: false));
 
-    result.fold(
+    return result.fold(
       (left) {
         emit(TodoFailure(message: (left as Failure).message));
       },

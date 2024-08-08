@@ -1,6 +1,7 @@
 import 'package:todo_api/api.dart';
 
 typedef TodoCallback = void Function(TodoEntity todo);
+typedef TodoFilterCallback = void Function(Filter filter);
 
 class TodoActions {
   TodoActions({

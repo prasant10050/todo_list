@@ -16,8 +16,10 @@ import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/extension/todo_state_extension.dart';
+import 'package:todo_list_app/app/view/features/todo/widget/todo_filter_widget.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_form.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_item.dart';
+import 'package:todo_list_app/app/widget/multiple_bloc_builder_widget.dart';
 import 'package:todo_list_app/app/widget/page_body.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -38,16 +40,17 @@ class _TodoListPageState extends State<TodoListPage> {
   @override
   void initState() {
     super.initState();
-    context.read<GetTodoBloc>().add(const GetAllTodoRequested());
+    _fetchTodoList(context);
   }
 
   void _fetchTodoList(BuildContext context) {
-    context.read<GetTodoBloc>().add(const GetAllTodoRequested());
+    if (context.mounted) {
+      context.read<GetTodoBloc>().add(const GetAllTodoRequested());
+    }
   }
 
   Future<TodoEntity?> _openDialog(
-    TodoEntity? todoEntity,
-    {
+    TodoEntity? todoEntity, {
     bool isNew = true,
     bool showMeDetails = false,
   }) {
@@ -81,14 +84,22 @@ class _TodoListPageState extends State<TodoListPage> {
 
   void _showDetails(TodoEntity todo) {
     context.read<GetTodoBloc>().add(
-           ShowTodoDetailsRequested(todoEntity: todo),
+          ShowTodoDetailsRequested(todoEntity: todo),
         );
+  }
+
+  void _filterTodo(Filter filter){
+    if(context.mounted) {
+      context
+          .read<GetTodoBloc>()
+          .add( FilterTodoRequested(filter: filter));
+    }
   }
 
   void _deleteTodo(TodoEntity todo) {
     context.read<RemoveTodoBloc>().add(
-      RemoveTodoRequested(taskId: todo.taskId),
-    );
+          RemoveTodoRequested(taskId: todo.taskId),
+        );
   }
 
   @override
@@ -158,40 +169,37 @@ class _TodoListPageState extends State<TodoListPage> {
                 },
               ),
             ],
-            child: MultiBlocBuilder(
-              blocs: [
-                context.read<GetTodoBloc>(),
-                context.read<AddTodoBloc>(),
-                context.read<RemoveTodoBloc>(),
-                context.read<MarkTodoBloc>(),
-                context.read<UpdateTodoBloc>(),
-                context.read<FilterTodoBloc>(),
-              ],
-              builder: (context, states) {
-                final todoState = states.get<TodoState>()
-                  ..mayBeMap(
-                    orElse: () {},
-                    getAll: (state) {
-                      buildPageState = TodoListBuildPageState.loaded;
-                      todoEntities =
-                          List<TodoEntity>.from(state.todoEntities.toList());
-                    },
-                    removeAll: (state) {
-                      buildPageState = TodoListBuildPageState.empty;
-                    },
-                    filterAll: (state) {
-                      buildPageState = TodoListBuildPageState.loaded;
-                      todoEntities =
-                          List<TodoEntity>.from(state.todoEntities.toList());
-                    },
-                    empty: (state) {
-                      buildPageState = TodoListBuildPageState.empty;
-                    },
-                    loading: (state) {
-                      isTodoLoading = state.isLoading;
-                      buildPageState = TodoListBuildPageState.loading;
-                    },
-                  );
+            child: BlocBuilder<
+                GetTodoBloc,
+                TodoState>(
+              buildWhen: (previous, current) => previous!=current,
+              builder: (context, state) {
+                state.mayBeMap(
+                  orElse: () {
+                    buildPageState = TodoListBuildPageState.empty;
+                    todoEntities=[];
+                  },
+                  getAll: (state) {
+                    buildPageState = TodoListBuildPageState.loaded;
+                    todoEntities = List<TodoEntity>.from(
+                        state.todoEntities.toList());
+                  },
+                  removeAll: (state) {
+                    buildPageState = TodoListBuildPageState.empty;
+                  },
+                  filterAll: (state) {
+                    buildPageState = TodoListBuildPageState.loaded;
+                    todoEntities = List<TodoEntity>.from(
+                        state.todoEntities.toList());
+                  },
+                  empty: (state) {
+                    buildPageState = TodoListBuildPageState.empty;
+                  },
+                  loading: (state) {
+                    isTodoLoading = state.isLoading;
+                    buildPageState = TodoListBuildPageState.loading;
+                  },
+                );
                 return SingleChildScrollView(
                   child: Container(
                     constraints: BoxConstraints(
@@ -211,38 +219,40 @@ class _TodoListPageState extends State<TodoListPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                         TodoFilterWidget(onFilter: _filterTodo,),
+                        const Divider(),
                         Expanded(
                           child: switch (buildPageState) {
                             TodoListBuildPageState.loading => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
+                              child: CircularProgressIndicator(),
+                            ),
                             TodoListBuildPageState.empty => const Center(
-                                child: Text('Empty'),
-                              ),
+                              child: Text('Empty'),
+                            ),
                             _ => CustomScrollView(
-                                slivers: [
-                                  SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                        final todo = todoEntities[index];
+                              slivers: [
+                                SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                        (context, index) {
+                                      final todo = todoEntities[index];
 
-                                        final todoActions = TodoActions(
-                                          onEdit: _editTodo,
-                                          onMarkAsDone: _markAsDone,
-                                          onShowDetails: _showDetails,
-                                          onDelete: _deleteTodo,
-                                        );
+                                      final todoActions = TodoActions(
+                                        onEdit: _editTodo,
+                                        onMarkAsDone: _markAsDone,
+                                        onShowDetails: _showDetails,
+                                        onDelete: _deleteTodo,
+                                      );
 
-                                        return TodoItem(
-                                          todoEntity: todo,
-                                          actions: todoActions,
-                                        );
-                                      },
-                                      childCount: todoEntities.length,
-                                    ),
+                                      return TodoItem(
+                                        todoEntity: todo,
+                                        actions: todoActions,
+                                      );
+                                    },
+                                    childCount: todoEntities.length,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
+                            ),
                           },
                         ),
                       ],
@@ -281,7 +291,7 @@ class _TodoListPageState extends State<TodoListPage> {
         }
       },
       discardTodo: (state) {
-        if(state.hasDiscard) {
+        if (state.hasDiscard) {
           Navigator.of(context).pop();
         }
       },

@@ -34,7 +34,6 @@ class TodoLocalDataSource implements ITodoDataSource {
       }
       final todoList = <TodoDto>[];
       for (final element in result.entries) {
-        print('${element.key}:${element.value}');
         todoList.add(TodoDto.fromMap(element.value as Map<String, dynamic>));
       }
       return Right(todoList);
