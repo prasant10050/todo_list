@@ -23,7 +23,7 @@ class AppBlocObserver extends BlocObserver {
 
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   WidgetsFlutterBinding.ensureInitialized();
-  ApplicationDependenciesModuleResolver.register(isMemory: false);
+  ApplicationDependenciesModuleResolver.register();
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };

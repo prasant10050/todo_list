@@ -26,22 +26,33 @@ class TodoItem extends StatelessWidget {
                   todoEntity.isCompleted ? TextDecoration.lineThrough : null,
             );
 
-    return ListTile(
-      title: Text(
-        todoEntity.title,
-        style: titleStyle,
+    return Card(
+      margin: const EdgeInsetsDirectional.only(
+        bottom: 16,
       ),
-      subtitle: Text(
-        todoEntity.description,
-        style: subTitleStyle,
-      ),
-      leading: Checkbox(
-        value: todoEntity.isCompleted,
-        onChanged: (value) => actions.onMarkAsDone(todoEntity),
-      ),
-      trailing: TodoItemPopupMenu(
-        actions: actions,
-        todoEntity: todoEntity,
+      child: ListTile(
+        contentPadding: const EdgeInsetsDirectional.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        title: Text(
+          todoEntity.title,
+          //style: titleStyle,
+        ),
+        titleTextStyle: titleStyle,
+        subtitle: Text(
+          todoEntity.description,
+          style: subTitleStyle,
+        ),
+        subtitleTextStyle: subTitleStyle,
+        leading: Checkbox(
+          value: todoEntity.isCompleted,
+          onChanged: (value) => actions.onMarkAsDone(todoEntity),
+        ),
+        trailing: TodoItemPopupMenu(
+          actions: actions,
+          todoEntity: todoEntity,
+        ),
       ),
     );
   }

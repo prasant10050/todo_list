@@ -1,13 +1,12 @@
 import 'package:domain/domain.dart';
-import 'package:either_dart/either.dart';
 import 'package:uuid/uuid.dart';
 
-class TaskId extends ValueObject<ValueFailure,String> {
+class TaskId extends ValueObject<String> {
 
   // We cannot let a simple String be passed in. This would allow for possible non-unique IDs.
   factory TaskId() {
     return TaskId._(
-      Right(const Uuid().v1()),
+      const Uuid().v1(),
     );
   }
 
@@ -15,11 +14,13 @@ class TaskId extends ValueObject<ValueFailure,String> {
   factory TaskId.fromUniqueString(String uniqueIdStr) {
     assert(uniqueIdStr.isNotEmpty,'uniqueIdStr must not be empty');
     return TaskId._(
-      Right(uniqueIdStr),
+      uniqueIdStr,
     );
   }
 
-  const TaskId._(this.value);
-  @override
-  final Either<ValueFailure, String> value;
+  const TaskId._(super.value);
+
+  factory TaskId.generate() {
+    return TaskId._(const Uuid().v4());
+  }
 }

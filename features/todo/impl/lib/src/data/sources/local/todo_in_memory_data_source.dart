@@ -1,20 +1,16 @@
-import 'package:domain/domain.dart';
-import 'package:domain/src/error/failure.dart';
 import 'package:flutter/foundation.dart';
 import 'package:todo_api/api.dart';
-import 'package:todo_impl/src/domain/mapper/todo_mapper.dart';
 
 class TodoInMemoryDataSource implements ITodoDataSource {
   TodoInMemoryDataSource({required this.mapper});
 
   final List<TodoDto> _tasks = [];
-  final Mapper<TodoEntity,TodoDto> mapper;
+  final Mapper<TodoEntity, TodoDto> mapper;
 
   @override
   Future<Either<Failure, TodoDto>> addTodo(TodoEntity todoEntity) async {
     try {
-      final id = const Uuid().v4();
-      final todo = todoEntity.copyWith(taskId: TaskId.fromUniqueString(id));
+      final todo = todoEntity.copyWith(taskId: TaskId.generate());
       final result = mapper.mapFromEntity(todo);
       _tasks.add(result);
       return Right(result);
@@ -38,14 +34,13 @@ class TodoInMemoryDataSource implements ITodoDataSource {
   @override
   Future<Either<Failure, TodoDto>> getTodo(TaskId todoId) async {
     try {
-      final cacheTodoId = todoId.getOrThrow();
       final defaultTodo = TodoDto(
         title: '',
         description: '',
-        taskId: '',
+        taskId: todoId.value,
       );
       final result = _tasks.firstWhere(
-        (element) => element.taskId == todoId,
+        (element) => element.taskId == todoId.value,
         orElse: () => defaultTodo,
       );
       if (result.taskId.isEmpty) {
@@ -64,8 +59,8 @@ class TodoInMemoryDataSource implements ITodoDataSource {
     TodoEntity todoEntity,
   ) async {
     try {
-      final id = todoEntity.taskId.getOrThrow();
-      final index = _tasks.indexWhere((element) => element.taskId == todoId);
+      final id = todoEntity.taskId.value;
+      final index = _tasks.indexWhere((element) => element.taskId == id);
       _tasks[index] = mapper.mapFromEntity(todoEntity);
       return Right(_tasks[index]);
     } catch (e) {
@@ -87,8 +82,8 @@ class TodoInMemoryDataSource implements ITodoDataSource {
   @override
   Future<Either<Failure, void>> removeTodo(TaskId todoId) async {
     try {
-      final id = todoId.getOrThrow();
-      return Right(_tasks.removeWhere((item) => item.taskId == todoId));
+      final id = todoId.value;
+      return Right(_tasks.removeWhere((item) => item.taskId == id));
     } catch (e) {
       debugPrint('RemoveTodo exception: $e');
       return const Left(DatabaseFailure('Could not delete todo: {}'));
@@ -98,8 +93,8 @@ class TodoInMemoryDataSource implements ITodoDataSource {
   @override
   Future<Either<Failure, TodoDto>> updateTodo(TodoEntity todoEntity) async {
     try {
-      final index =
-          _tasks.indexWhere((element) => element.taskId == todoEntity.taskId);
+      final index = _tasks
+          .indexWhere((element) => element.taskId == todoEntity.taskId.value);
       _tasks[index] = mapper.mapFromEntity(todoEntity);
       return Right(_tasks[index]);
     } catch (e) {

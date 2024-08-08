@@ -1,9 +1,7 @@
-import 'package:domain/domain.dart';
-import 'package:either_dart/src/either.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_api/src/api.dart';
 
-class TodoEntity extends ValueObject<ValueFailure,TaskId>{
+class TodoEntity {
   const TodoEntity({
     required this.title,
     required this.description,
@@ -30,7 +28,7 @@ class TodoEntity extends ValueObject<ValueFailure,TaskId>{
       'title': title,
       'description': description,
       'isCompleted': isCompleted,
-      'taskId': taskId.value.right,
+      'taskId': taskId.value,
     };
   }
 
@@ -47,7 +45,4 @@ class TodoEntity extends ValueObject<ValueFailure,TaskId>{
       taskId: taskId ?? this.taskId,
     );
   }
-
-  @override
-  Either<ValueFailure, TaskId> get value => Right(TaskId());
 }

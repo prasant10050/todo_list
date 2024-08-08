@@ -34,9 +34,14 @@ class _TodoFormState extends State<TodoForm> {
   @override
   void initState() {
     super.initState();
-
     textInputTitleController = TextEditingController();
     textInputDescriptionController = TextEditingController();
+
+    final entity = widget.todoEntity;
+    if (entity == null) return;
+
+    textInputTitleController.text = entity.title;
+    textInputDescriptionController.text = entity.description;
   }
 
   @override
@@ -156,18 +161,26 @@ class _TodoFormState extends State<TodoForm> {
               TextButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final todo = TodoEntity(
-                      title: textInputTitleController.value.text,
-                      description: textInputDescriptionController.value.text,
-                      taskId: TaskId.fromUniqueString('default'),
-                    );
-
-                    if (widget.isNew) {
+                    _formKey.currentState?.save();
+                    final title = textInputTitleController.value.text;
+                    final description = textInputDescriptionController.value.text;
+                    final entity = widget.todoEntity;
+                    // Edit or update `todo`
+                    if (!widget.isNew && entity != null) {
+                      final copyEntity = entity.copyWith(
+                        title: title,
+                        description: description,
+                      );
                       context
                           .read<UpdateTodoBloc>()
-                          .add(UpdateTodoRequested(todoEntity: todo));
+                          .add(UpdateTodoRequested(todoEntity: copyEntity));
                     }
-
+                    // New entry `todo`
+                    final todo = TodoEntity(
+                      title: title,
+                      description: description,
+                      taskId: TaskId.generate(),
+                    );
                     context
                         .read<AddTodoBloc>()
                         .add(AddTodoRequested(todoEntity: todo));

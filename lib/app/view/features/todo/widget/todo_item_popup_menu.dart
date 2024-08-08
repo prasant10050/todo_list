@@ -20,7 +20,7 @@ class TodoItemPopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final animationStyle = AnimationStyle(
       curve: Easing.emphasizedDecelerate,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 300),
     );
     return PopupMenuButton<Menu>(
       popUpAnimationStyle: animationStyle,

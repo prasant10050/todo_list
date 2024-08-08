@@ -3,7 +3,7 @@ import 'package:localstore/localstore.dart';
 abstract class BaseStorage<T, R> {
   Future<T?> getByKey(String id, {T? defaultValue});
 
-  Future<String> put(Map<String,dynamic> entity);
+  Future<void> put(String id, Map<String, dynamic> entity);
 
   Future<void> delete(String id);
 
@@ -15,12 +15,17 @@ abstract class BaseStorage<T, R> {
 
   Stream<Map<String, dynamic>> getAllStreamValuesInMap();
 
-  Future<R> update(String id, T entity);
+  Future<void> update(String id, Map<String, dynamic> entity);
+
+  String get getNewId;
 }
 
 class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
   final _db = Localstore.instance;
   final String _path = 'todos';
+
+  @override
+  String get getNewId => _db.collection(_path).doc().id;
 
   @override
   Future<void> clear() async {
@@ -60,13 +65,9 @@ class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
   }
 
   @override
-  Future<String> put( Map<String, dynamic> entity) async {
-      // gets new id
-      final id = _db.collection(_path).doc().id;
-      // save the item
-      await _db.collection(_path).doc(id).set(entity as Map<String, dynamic>);
-      return id;
-
+  Future<void> put(String id, Map<String, dynamic> entity) async {
+    // save the item
+    await _db.collection(_path).doc(id).set(entity);
   }
 
   @override
@@ -75,16 +76,11 @@ class SecureLocalStorage<T, R> implements BaseStorage<T, R> {
   }
 
   @override
-  Future<R> update(String id, T entity) async {
-    if (T is Map<String, dynamic>) {
-      // save the item
-      final result = await _db
-          .collection(_path)
-          .doc(id)
-          .set(entity as Map<String, dynamic>);
-      return result as R;
-    } else {
-      throw Exception('Type is not supported');
-    }
+  Future<void> update(String id, Map<String, dynamic> entity) async {
+    print('Update date:${entity}');
+    await _db
+        .collection(_path)
+        .doc(id)
+        .set(entity,SetOptions(merge: true));
   }
 }

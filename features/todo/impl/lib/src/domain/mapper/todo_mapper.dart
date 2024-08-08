@@ -1,4 +1,3 @@
-import 'package:domain/domain.dart';
 import 'package:todo_api/api.dart';
 
 class TodoMapper implements Mapper<TodoEntity, TodoDto> {
@@ -6,7 +5,7 @@ class TodoMapper implements Mapper<TodoEntity, TodoDto> {
   TodoDto mapFromEntity(TodoEntity entity) => TodoDto(
         title: entity.title,
         description: entity.description,
-        taskId: entity.taskId.value.right,
+        taskId: entity.taskId.value,
         isCompleted: entity.isCompleted,
       );
 
