@@ -16,9 +16,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const themeMode = ThemeMode.system;
-    // Opt in/out on Material 3
-    const useMaterial3 = true;
     const usedScheme = FlexScheme.amber;
 
     return MultiBlocProvider(
@@ -57,7 +54,7 @@ class App extends StatelessWidget {
         // Use the above dark or light theme based on active themeMode.
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: TodoListPage(),
+        home: const TodoListPage(),
       ),
     );
   }

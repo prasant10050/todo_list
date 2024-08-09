@@ -89,7 +89,8 @@ class _TodoListPageState extends State<TodoListPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TodoFilterWidget(
+                        if(buildPageState==TodoListBuildPageState.loaded)
+                        ...[TodoFilterWidget(
                           onFilter: _filterTodo,
                         ),
                         const Divider(),
@@ -97,7 +98,7 @@ class _TodoListPageState extends State<TodoListPage> {
                           countCompletedTodo: countCompletedTodo,
                           countTotalTodo: countTotalTodo,
                         ),
-                        const Divider(),
+                        const Divider(),],
                         Expanded(
                           child: _TodoListView(
                             buildPageState: buildPageState,
@@ -289,7 +290,9 @@ typedef MultiBlocListenerAction = void Function(
 
 class _MultiBlocListener extends StatelessWidget {
   const _MultiBlocListener({
-    required this.action, required this.child, super.key,
+    required this.action,
+    required this.child,
+    super.key,
   });
 
   final Widget child;
@@ -361,13 +364,26 @@ class _TodoListViewState extends State<_TodoListView> {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
     if (widget.buildPageState == TodoListBuildPageState.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (widget.buildPageState == TodoListBuildPageState.empty) {
-      return const Center(
-        child: Text('No todos found. Add some tasks to get started.'),
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/images/tasks.png',
+            fit: BoxFit.cover,
+            height: media.size.height * 0.3,
+          ),
+          Text(
+            'No todos found. Add some tasks to get started.',
+            style: Theme.of(context).textTheme.titleLarge,
+            textAlign: TextAlign.center,
+          ),
+        ],
       );
     }
 

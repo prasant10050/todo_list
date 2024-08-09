@@ -12,7 +12,8 @@ class GlobalConfig {
   // Info about the app.
 
   /// Returns the title of the MaterialApp.
-  static String title(BuildContext context) => (context as Element).findAncestorWidgetOfExactType<MaterialApp>()!.title;
+  static String title(BuildContext context) =>
+      (context as Element).findAncestorWidgetOfExactType<MaterialApp>()!.title;
 
   /// The max dp width used for layout content on the screen in the available
   /// body area.
@@ -85,9 +86,12 @@ class GlobalConfig {
   ///
   /// Use what you prefer, I just like this one on desktop better than the
   /// default one. The default Flutter one is too dense imo.
-  static VisualDensity get visualDensity => FlexColorScheme.comfortablePlatformDensity;
+  static VisualDensity get visualDensity =>
+      FlexColorScheme.comfortablePlatformDensity;
 
-  static const String defaultMessageDuringLoading = 'Please wait while we are fetching';
-  static const String defaultSomethingWentWrong = 'Something went wrong, please try again later';
+  static const String defaultMessageDuringLoading =
+      'Please wait while we are fetching';
+  static const String defaultSomethingWentWrong =
+      'Something went wrong, please try again later';
   static const String defaultFailure = 'Failure';
 }
