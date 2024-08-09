@@ -4,7 +4,6 @@ import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/mark_todo/mark_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart';
-import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
 
 class ApplicationDependenciesModuleResolver {
   static const String inMemory = 'in-memory';
@@ -23,6 +22,9 @@ class ApplicationDependenciesModuleResolver {
     DependencyProvider.registerFactory<AddTodoBloc>(
       () => AddTodoBloc(
         addTodoUsecase: DependencyProvider.get<AddTodoUsecase>(
+          instanceName: isMemory ? inMemory : local,
+        ),
+        updateTodoUsecase: DependencyProvider.get<UpdateTodoUsecase>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),
@@ -53,13 +55,6 @@ class ApplicationDependenciesModuleResolver {
           instanceName: isMemory ? inMemory : local,
         ),
         removeAllTodoUsecase: DependencyProvider.get<RemoveAllTodoUsecase>(
-          instanceName: isMemory ? inMemory : local,
-        ),
-      ),
-    );
-    DependencyProvider.registerFactory<UpdateTodoBloc>(
-      () => UpdateTodoBloc(
-        updateTodoUsecase: DependencyProvider.get<UpdateTodoUsecase>(
           instanceName: isMemory ? inMemory : local,
         ),
       ),

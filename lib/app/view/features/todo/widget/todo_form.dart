@@ -4,7 +4,6 @@ import 'package:todo_api/api.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
-import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
 
 class TodoForm extends StatefulWidget {
   const TodoForm({
@@ -139,18 +138,13 @@ class _TodoFormState extends State<TodoForm> {
           : [
               TextButton(
                 onPressed: () {
-                  if (!widget.isNew && widget.todoEntity != null) {
-                    context.read<UpdateTodoBloc>().add(
-                          OpenEditTodoDialogRequested(
-                            todoEntity: widget.todoEntity!,
-                            hasOpened: false,
-                          ),
-                        );
-                  } else {
-                    context.read<AddTodoBloc>().add(
-                          const OpenAddTodoDialogRequested(hasOpened: false),
-                        );
-                  }
+                  final entity = widget.todoEntity;
+                  context.read<AddTodoBloc>().add(
+                        OpenAddTodoDialogRequested(
+                          hasOpened: false,
+                          todoEntity: entity,
+                        ),
+                      );
                   return;
                 },
                 child: const Text('Cancel'),
@@ -171,7 +165,7 @@ class _TodoFormState extends State<TodoForm> {
                       );
 
                       context
-                          .read<UpdateTodoBloc>()
+                          .read<AddTodoBloc>()
                           .add(UpdateTodoRequested(todoEntity: copyEntity));
                     } else {
                       // New entry `todo`

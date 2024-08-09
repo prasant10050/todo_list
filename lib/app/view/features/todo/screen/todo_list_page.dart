@@ -13,7 +13,6 @@ import 'package:todo_list_app/app/view/features/todo/bloc/mark_todo/mark_todo_bl
 import 'package:todo_list_app/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_event.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
-import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/extension/todo_state_extension.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_filter_widget.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_form.dart';
@@ -33,7 +32,7 @@ class _TodoListPageState extends State<TodoListPage> {
   bool isTodoLoading = false;
   bool isTodoProcessing = false;
   bool hasTodoEmpty = false;
-  var countTotalTodo = 1;
+  var countTotalTodo = 0;
   var countCompletedTodo = 0;
 
   TodoListBuildPageState buildPageState = TodoListBuildPageState.loading;
@@ -44,10 +43,77 @@ class _TodoListPageState extends State<TodoListPage> {
     _fetchTodoList(context);
   }
 
-  void _fetchTodoList(BuildContext context) {
-    if (context.mounted) {
-      context.read<GetTodoBloc>().add(const GetAllTodoRequested());
-    }
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final margins = GlobalConfig.responsiveInsets(media.size.width);
+    final topPadding = margins;
+    final maxHeight = media.size.height -
+        (media.padding.top + kToolbarHeight + media.padding.bottom);
+    //final bottomPadding = media.padding.bottom + margins;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: FlexColorScheme.themedSystemNavigationBar(
+        context,
+        useDivider: false,
+      ),
+      child: Scaffold(
+        appBar: _TodoAppBar(),
+        floatingActionButton: _AddTodoButton(),
+        body: PageBody(
+          controller: ScrollController(),
+          constraints: BoxConstraints(
+            minWidth: double.infinity,
+            minHeight: media.size.height,
+          ),
+          child: _MultiBlocListener(
+            key: const Key('_TodoBlocListenerKey'),
+            action: _listenState,
+            child: BlocBuilder<GetTodoBloc, TodoState>(
+              buildWhen: (previous, current) => previous != current,
+              builder: (context, state) {
+                _updatePageState(state);
+                return SingleChildScrollView(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minWidth: double.infinity,
+                      maxHeight: maxHeight,
+                    ),
+                    padding: EdgeInsetsDirectional.only(
+                      top: topPadding,
+                      start: margins * 2.5,
+                      end: margins * 2.5,
+                      //bottom: bottomPadding,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TodoFilterWidget(
+                          onFilter: _filterTodo,
+                        ),
+                        const Divider(),
+                        _TodoSummary(
+                          countCompletedTodo: countCompletedTodo,
+                          countTotalTodo: countTotalTodo,
+                        ),
+                        const Divider(),
+                        Expanded(
+                          child: _TodoListView(
+                            buildPageState: buildPageState,
+                            todoEntities: todoEntities,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<TodoEntity?> _openDialog(
@@ -67,26 +133,10 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 
-  void _editTodo(
-    TodoEntity todo,
-  ) {
-    context
-        .read<UpdateTodoBloc>()
-        .add(OpenEditTodoDialogRequested(todoEntity: todo));
-  }
-
-  void _markAsDone(TodoEntity todo) {
-    context.read<MarkTodoBloc>().add(
-          MarkTodoRequested(
-            todoEntity: todo.copyWith(isCompleted: !todo.isCompleted),
-          ),
-        );
-  }
-
-  void _showDetails(TodoEntity todo) {
-    context.read<GetTodoBloc>().add(
-          ShowTodoDetailsRequested(todoEntity: todo),
-        );
+  void _fetchTodoList(BuildContext context) {
+    if (context.mounted) {
+      context.read<GetTodoBloc>().add(const GetAllTodoRequested());
+    }
   }
 
   void _filterTodo(Filter filter) {
@@ -95,240 +145,7 @@ class _TodoListPageState extends State<TodoListPage> {
     }
   }
 
-  void _deleteTodo(TodoEntity todo) {
-    context.read<RemoveTodoBloc>().add(
-          RemoveTodoRequested(taskId: todo.taskId),
-        );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final margins = GlobalConfig.responsiveInsets(media.size.width);
-    final topPadding =
-        margins; //media.padding.top + kToolbarHeight + margins; //margins * 1.5;
-    final bottomPadding = media.padding.bottom + margins;
-    final width = media.size.width;
-    final theme = Theme.of(context);
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: FlexColorScheme.themedSystemNavigationBar(
-        context,
-        useDivider: false,
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsetsDirectional.only(start: 1),
-                child: SizedBox(
-                  height: 45,
-                  width: 45,
-                  // margin: EdgeInsets.only(left: .0.wp),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset('assets/images/robo_avatar.png'),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              GradientText(
-                'ToDo - Prasant',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                gradient: const LinearGradient(colors: [
-                  Color.fromARGB(255, 59, 67, 88),
-                  Color.fromARGB(255, 90, 69, 69),
-                ],),
-              ),
-            ],
-          ),
-          actions: [],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            context.read<AddTodoBloc>().add(
-                  const OpenAddTodoDialogRequested(),
-                );
-            return;
-          },
-          child: const Icon(Icons.add),
-        ),
-        body: PageBody(
-          controller: ScrollController(),
-          constraints: BoxConstraints(
-            minWidth: double.infinity,
-            minHeight: media.size.height,
-          ),
-          child: MultiBlocListener(
-            listeners: [
-              BlocListener<GetTodoBloc, TodoState>(
-                listener: (context, todoState) {
-                  return _listenState(todoState, context);
-                },
-              ),
-              BlocListener<AddTodoBloc, TodoState>(
-                listener: (context, todoState) {
-                  return _listenState(todoState, context);
-                },
-              ),
-              BlocListener<RemoveTodoBloc, TodoState>(
-                listener: (context, todoState) {
-                  return _listenState(todoState, context);
-                },
-              ),
-              BlocListener<MarkTodoBloc, TodoState>(
-                listener: (context, todoState) {
-                  return _listenState(todoState, context);
-                },
-              ),
-              BlocListener<UpdateTodoBloc, TodoState>(
-                listener: (context, todoState) {
-                  return _listenState(todoState, context);
-                },
-              ),
-            ],
-            child: BlocBuilder<GetTodoBloc, TodoState>(
-              buildWhen: (previous, current) => previous != current,
-              builder: (context, state) {
-                state.mayBeMap(
-                  orElse: () {
-                    buildPageState = TodoListBuildPageState.loaded;
-                  },
-                  getAll: (state) {
-                    buildPageState = TodoListBuildPageState.loaded;
-                    todoEntities =
-                        List<TodoEntity>.from(state.todoEntities.toList());
-                    countTotalTodo = todoEntities.length;
-                    countCompletedTodo = todoEntities
-                        .where((task) => task.isCompleted)
-                        .toList()
-                        .length;
-                  },
-                  removeAll: (state) {
-                    buildPageState = TodoListBuildPageState.empty;
-                    countTotalTodo = todoEntities.length;
-                    countCompletedTodo = 0;
-                  },
-                  filterAll: (state) {
-                    buildPageState = TodoListBuildPageState.loaded;
-                    todoEntities =
-                        List<TodoEntity>.from(state.todoEntities.toList());
-                  },
-                  empty: (state) {
-                    buildPageState = TodoListBuildPageState.empty;
-                  },
-                  loading: (state) {
-                    isTodoLoading = state.isLoading;
-                    buildPageState = TodoListBuildPageState.loading;
-                  },
-                );
-
-                return SingleChildScrollView(
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minWidth: double.infinity,
-                      maxHeight: media.size.height -
-                          (media.padding.top +
-                              kToolbarHeight +
-                              media.padding.bottom),
-                    ),
-                    padding: EdgeInsetsDirectional.only(
-                      top: topPadding,
-                      start: margins * 2.5,
-                      end: margins * 2.5,
-                      //bottom: bottomPadding,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        TodoFilterWidget(
-                          onFilter: _filterTodo,
-                        ),
-                        const Divider(),
-                        Padding(
-                          padding: const EdgeInsetsDirectional.only(
-                              start: 16, end: 16, top: 8, bottom: 8,),
-                          child: Row(
-                            children: [
-                              Text(
-                                '$countCompletedTodo of $countTotalTodo Tasks',
-                                style: theme.textTheme.bodyLarge,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: StepProgressIndicator(
-                                  totalSteps: countTotalTodo,
-                                  currentStep: countCompletedTodo,
-                                  size: 16,
-                                  padding: 0,
-                                  roundedEdges: const Radius.circular(10),
-                                  selectedGradientColor: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [theme.colorScheme.surfaceTint.withOpacity(0.5), theme.colorScheme.surfaceTint],
-                                  ),
-                                  unselectedGradientColor: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [theme.colorScheme.inversePrimary, theme.colorScheme.inversePrimary],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Divider(),
-                        Expanded(
-                          child: switch (buildPageState) {
-                            TodoListBuildPageState.loading => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            TodoListBuildPageState.empty => const Center(
-                                child: Text('Empty'),
-                              ),
-                            _ => CustomScrollView(
-                                slivers: [
-                                  SliverList(
-                                    delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                        final todo = todoEntities[index];
-
-                                        final todoActions = TodoActions(
-                                          onEdit: _editTodo,
-                                          onMarkAsDone: _markAsDone,
-                                          onShowDetails: _showDetails,
-                                          onDelete: _deleteTodo,
-                                        );
-
-                                        return TodoItem(
-                                          todoEntity: todo,
-                                          actions: todoActions,
-                                        );
-                                      },
-                                      childCount: todoEntities.length,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _listenState(TodoState todoState, BuildContext context) {
+  void _listenState(BuildContext context, TodoState todoState) {
     return todoState.mapOrNull(
       error: (state) {},
       openAddTodoDialog: (state) {
@@ -337,17 +154,7 @@ class _TodoListPageState extends State<TodoListPage> {
         } else {
           Future.delayed(
             Durations.short2,
-            () async => _openDialog(null),
-          );
-        }
-      },
-      openEditTodoDialog: (state) {
-        if (!state.hasOpened) {
-          Navigator.of(context).pop();
-        } else {
-          Future.delayed(
-            Durations.short2,
-            () async => _openDialog(state.todoEntity, isNew: false),
+            () async => _openDialog(state.todoEntity, isNew: state.isNew),
           );
         }
       },
@@ -385,6 +192,277 @@ class _TodoListPageState extends State<TodoListPage> {
       updateTodo: (state) {
         _fetchTodoList(context);
       },
+    );
+  }
+
+  void _updatePageState(TodoState state) {
+    state.mayBeMap(
+      orElse: () {
+        buildPageState = TodoListBuildPageState.loaded;
+      },
+      getAll: (state) {
+        buildPageState = TodoListBuildPageState.loaded;
+        todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+        countTotalTodo = todoEntities.length;
+        countCompletedTodo =
+            todoEntities.where((task) => task.isCompleted).length;
+      },
+      removeAll: (state) {
+        buildPageState = TodoListBuildPageState.empty;
+        countTotalTodo = todoEntities.length;
+        countCompletedTodo = 0;
+      },
+      filterAll: (state) {
+        buildPageState = TodoListBuildPageState.loaded;
+        todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+      },
+      empty: (state) {
+        buildPageState = TodoListBuildPageState.empty;
+      },
+      loading: (state) {
+        isTodoLoading = state.isLoading;
+        buildPageState = TodoListBuildPageState.loading;
+      },
+    );
+  }
+}
+
+class _AddTodoButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        context.read<AddTodoBloc>().add(const OpenAddTodoDialogRequested());
+      },
+      tooltip: 'Add Todo',
+      child: const Icon(Icons.add),
+    );
+  }
+}
+
+class _TodoAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(start: 1),
+            child: SizedBox(
+              height: 45,
+              width: 45,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset('assets/images/robo_avatar.png'),
+              ),
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: GradientText(
+              'Prasant - Todolist',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+              gradient: const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 59, 67, 88),
+                  Color.fromARGB(255, 90, 69, 69),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+typedef MultiBlocListenerAction = void Function(
+  BuildContext context,
+  TodoState state,
+);
+
+class _MultiBlocListener extends StatelessWidget {
+  const _MultiBlocListener({
+    required this.action, required this.child, super.key,
+  });
+
+  final Widget child;
+  final MultiBlocListenerAction action;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<GetTodoBloc, TodoState>(
+          listener: action,
+        ),
+        BlocListener<AddTodoBloc, TodoState>(
+          listener: action,
+        ),
+        BlocListener<RemoveTodoBloc, TodoState>(
+          listener: action,
+        ),
+        BlocListener<MarkTodoBloc, TodoState>(
+          listener: action,
+        ),
+      ],
+      child: child,
+    );
+  }
+}
+
+class _TodoListView extends StatefulWidget {
+  const _TodoListView({
+    required this.buildPageState,
+    required this.todoEntities,
+  });
+
+  final TodoListBuildPageState buildPageState;
+  final List<TodoEntity> todoEntities;
+
+  @override
+  State<_TodoListView> createState() => _TodoListViewState();
+}
+
+class _TodoListViewState extends State<_TodoListView> {
+  void _editTodo(
+    TodoEntity todo,
+  ) {
+    context
+        .read<AddTodoBloc>()
+        .add(OpenAddTodoDialogRequested(todoEntity: todo, isNew: false));
+  }
+
+  void _markAsDone(TodoEntity todo) {
+    context.read<MarkTodoBloc>().add(
+          MarkTodoRequested(
+            todoEntity: todo.copyWith(isCompleted: !todo.isCompleted),
+          ),
+        );
+  }
+
+  void _showDetails(TodoEntity todo) {
+    context.read<GetTodoBloc>().add(
+          ShowTodoDetailsRequested(todoEntity: todo),
+        );
+  }
+
+  void _deleteTodo(TodoEntity todo) {
+    context.read<RemoveTodoBloc>().add(
+          RemoveTodoRequested(taskId: todo.taskId),
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.buildPageState == TodoListBuildPageState.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (widget.buildPageState == TodoListBuildPageState.empty) {
+      return const Center(
+        child: Text('No todos found. Add some tasks to get started.'),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: [
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final todo = widget.todoEntities[index];
+
+              final todoActions = TodoActions(
+                onEdit: _editTodo,
+                onMarkAsDone: _markAsDone,
+                onShowDetails: _showDetails,
+                onDelete: _deleteTodo,
+              );
+
+              return TodoItem(
+                todoEntity: todo,
+                actions: todoActions,
+              );
+            },
+            childCount: widget.todoEntities.length,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TodoSummary extends StatelessWidget {
+  const _TodoSummary({
+    required this.countCompletedTodo,
+    required this.countTotalTodo,
+  });
+
+  final int countCompletedTodo;
+  final int countTotalTodo;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    if (countTotalTodo == 0) {
+      return const Offstage();
+    }
+    return Padding(
+      padding:
+          const EdgeInsetsDirectional.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: StepProgressIndicator(
+              totalSteps: countTotalTodo,
+              currentStep: countCompletedTodo,
+              size: 16,
+              padding: 0,
+              roundedEdges: const Radius.circular(10),
+              selectedGradientColor: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  theme.colorScheme.surfaceTint.withOpacity(0.5),
+                  theme.colorScheme.surfaceTint,
+                ],
+              ),
+              unselectedGradientColor: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  theme.colorScheme.inversePrimary,
+                  theme.colorScheme.inversePrimary,
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          AnimatedSwitcher(
+            duration: Durations.medium2,
+            transitionBuilder: (child, animation) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.2, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
+            child: Text(
+              '$countCompletedTodo/$countTotalTodo completed',
+              key: ValueKey<int>(countCompletedTodo),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

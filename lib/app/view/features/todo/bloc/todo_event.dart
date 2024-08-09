@@ -83,12 +83,18 @@ class FilterTodoRequested extends TodoEvent {
 }
 
 class OpenAddTodoDialogRequested extends TodoEvent {
-  const OpenAddTodoDialogRequested({this.hasOpened = true});
+  const OpenAddTodoDialogRequested({
+    this.hasOpened = true,
+    this.todoEntity,
+    this.isNew = true,
+  });
 
   final bool hasOpened;
+  final TodoEntity? todoEntity;
+  final bool isNew;
 
   @override
-  List<Object?> get props => [hasOpened];
+  List<Object?> get props => [hasOpened, todoEntity, isNew];
 }
 
 class OpenEditTodoDialogRequested extends TodoEvent {

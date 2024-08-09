@@ -8,7 +8,6 @@ import 'package:todo_list_app/app/view/features/todo/bloc/add_todo/add_todo_bloc
 import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/mark_todo/mark_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart';
-import 'package:todo_list_app/app/view/features/todo/bloc/update_todo/update_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/screen/todo_list_page.dart';
 import 'package:todo_list_app/l10n/l10n.dart';
 
@@ -32,9 +31,6 @@ class App extends StatelessWidget {
         ),
         BlocProvider<MarkTodoBloc>(
           create: (context) => DependencyProvider.get<MarkTodoBloc>(),
-        ),
-        BlocProvider<UpdateTodoBloc>(
-          create: (context) => DependencyProvider.get<UpdateTodoBloc>(),
         ),
         BlocProvider<GetTodoBloc>(
           create: (context) => DependencyProvider.get<GetTodoBloc>(),

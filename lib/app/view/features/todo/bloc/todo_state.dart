@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:todo_api/api.dart';
-import 'package:todo_list_app/app/common/todo_actions.dart';
 
 abstract class TodoState extends Equatable {
   const TodoState();
@@ -135,12 +134,18 @@ class FilterTodoState extends TodoState {
 }
 
 class OpenAddTodoDialogState extends TodoState {
-  const OpenAddTodoDialogState({this.hasOpened = true});
+  const OpenAddTodoDialogState({
+    this.hasOpened = true,
+    this.todoEntity,
+    this.isNew = true,
+  });
 
   final bool hasOpened;
+  final TodoEntity? todoEntity;
+  final bool isNew;
 
   @override
-  List<Object?> get props => [hasOpened];
+  List<Object?> get props => [hasOpened, todoEntity,isNew];
 }
 
 class DiscardTodoDialogState extends TodoState {
@@ -166,11 +171,11 @@ class OpenEditTodoDialogState extends TodoState {
 }
 
 class ShowTodoDetailsState extends TodoState {
-  const ShowTodoDetailsState({required this.todoEntity,this.hasOpened = true});
+  const ShowTodoDetailsState({required this.todoEntity, this.hasOpened = true});
 
   final bool hasOpened;
   final TodoEntity todoEntity;
 
   @override
-  List<Object?> get props => [hasOpened,todoEntity];
+  List<Object?> get props => [hasOpened, todoEntity];
 }
