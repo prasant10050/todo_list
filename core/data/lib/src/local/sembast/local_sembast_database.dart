@@ -10,7 +10,8 @@ import 'package:sembast/utils/value_utils.dart';
 import 'package:sembast_web/sembast_web.dart';
 
 class LocalSembastDatabase {
-  // A private constructor. Allows us to create instances of LocalSembastDatabase
+  // A private constructor. Allows us to create instances of
+  // LocalSembastDatabase
   // only from within the LocalSembastDatabase class itself.
   LocalSembastDatabase._();
 
@@ -31,14 +32,18 @@ class LocalSembastDatabase {
   //var factory = databaseFactoryWeb;
   // Database object accessor
   Future<Database> get database async {
-    // If completer is null, LocalSembastDatabaseClass is newly instantiated, so database is not yet opened
+    // If completer is null, LocalSembastDatabaseClass is newly instantiated,
+    // so database is not yet opened
     if (_dbOpenCompleter == null) {
       _dbOpenCompleter = Completer();
-      // Calling _openDatabase will also complete the completer with database instance
+      // Calling _openDatabase will also complete the completer
+      // with database instance
       await _openDatabase();
     }
-    // If the database is already opened, awaiting the future will happen instantly.
-    // Otherwise, awaiting the returned future will take some time - until complete() is called
+    // If the database is already opened,
+    // awaiting the future will happen instantly.
+    // Otherwise, awaiting the returned future will take
+    // some time - until complete() is called
     // on the Completer in _openDatabase() below.
     return _dbOpenCompleter!.future;
   }
@@ -130,10 +135,6 @@ class LocalSembastDataDao implements BaseStorage {
   }
 
   @override
-  // TODO: implement getNewId
-  String get getNewId => throw UnimplementedError();
-
-  @override
   Future<void> put(String id, Map<String, dynamic> entity) async {
     await _todoStore.record(id).put(
           await _db,
@@ -145,10 +146,9 @@ class LocalSembastDataDao implements BaseStorage {
 
   @override
   Future<void> update(String id, Map<String, dynamic> entity) async {
-    final value=await getByKey(id) as Map<String,dynamic>;
+    final value = await getByKey(id) as Map<String, dynamic>;
     var map = cloneMap(value);
-    map=entity;
+    map = entity;
     await _todoStore.record(id).put(await _db, map, merge: true);
-    final updatedRecord=await getByKey(id) as Map<String,dynamic>;
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:todo_api/api.dart';
 import 'package:todo_list_app/app/common/todo_actions.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_item_popup_menu.dart';
-import 'package:todo_list_app/app/widget/sliding_widget.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
