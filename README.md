@@ -174,3 +174,104 @@ Alternatively, run `flutter run` and code generation will take place automatical
 [very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
 [very_good_analysis_link]: https://pub.dev/packages/very_good_analysis
 [very_good_cli_link]: https://github.com/VeryGoodOpenSource/very_good_cli
+
+The provided code snippet defines a TodoListPage widget that manages and displays a list of to-do items using multiple BLoC instances for state management. Here is a detailed explanation of the code:
+
+### Imports
+The code imports various packages and modules required for the functionality, including:
+
+- flex_color_scheme for theming.
+- flutter/material.dart and flutter/services.dart for Flutter UI components.
+- flutter_bloc for BLoC state management.
+- step_progress_indicator for displaying progress indicators.
+- todo_api/api.dart for API interactions.
+- Various internal modules for global configurations, enums, actions, BLoC implementations, extensions, and widgets.
+### TodoListPage Widget
+The TodoListPage is a stateful widget that manages the state of the to-do list.
+
+State Variables
+- todoEntities: List of to-do items.
+- isTodoLoading, isTodoProcessing, hasTodoEmpty: Boolean flags for different states.
+- countTotalTodo, countCompletedTodo, countPendingTodo: Counters for different types of to-do items.
+- allTodos, allPendingTodos, allCompletedTodos: Lists for all, pending, and completed to-do items.
+- currentSelectedFiler: The current filter applied to the to-do list.
+- buildPageState: The current state of the page (loading, empty, loaded, listEmpty).
+### initState Method
+The initState method is called when the widget is first created. It fetches the initial list of to-do items by calling _fetchTodoList.
+
+### build Method
+The build method constructs the UI of the TodoListPage:
+
+- It uses MediaQuery to get the screen dimensions and calculate padding and height.
+- It returns a Scaffold widget with an app bar, a floating action button, and the main body.
+- The main body is wrapped in a PageBody widget and uses a BlocBuilder to rebuild the UI based on the state of GetTodoBloc.
+_fetchTodoList Method
+- This method triggers the fetching of all to-do items by dispatching a GetAllTodoRequested event to the GetTodoBloc.
+
+### _filterTodo Method
+This method filters the to-do items based on the selected filter by dispatching a FilterTodoRequested event to the GetTodoBloc.
+
+### _listenState Method
+This method listens to state changes and updates the UI accordingly. It handles various states like error, openAddTodoDialog, discardTodo, todoDetails, processing, addTodo, markAsDone, remove, and updateTodo.
+
+### _updatePageState Method
+This method updates the page state based on the current TodoState. It handles states like yieldAllTodo, removeAll, filterAll, empty, and loading.
+
+### _yieldAllTodo Method
+This method updates the lists of all, pending, and completed to-do items based on the YieldAllTodoState.
+
+### _emptyState Method
+This method sets the page state to empty and clears all to-do lists.
+
+### _countAllTodo Method
+This method counts the total, completed, and pending to-do items.
+
+### _fetchAllTodoFromFilter Method
+This method fetches the to-do items based on the current filter and updates the page state accordingly.
+
+### _TodoFloatingActionButton Widget
+This stateless widget defines the floating action button with options to add a new to-do item or remove all to-do items.
+
+### _TodoAppBar Widget
+This stateless widget defines the app bar with a title and an avatar image.
+
+### _MultiBlocListener Widget
+This stateless widget listens to multiple BLoC instances and triggers the provided action on state changes.
+
+### _TodoListView Widget
+This stateful widget displays the list of to-do items based on the current page state. It handles actions like edit, mark as done, show details, and delete for each to-do item.
+
+### _TodoEmpty Widget
+This stateless widget displays a message when there are no to-do items.
+
+### _TodoSummary Widget
+This stateless widget displays a summary of the completed and total to-do items using a StepProgressIndicator.
+
+### Example Usage
+To use the TodoListPage widget, include it in your widget tree:
+
+```MaterialApp(
+home: const TodoListPage();
+```
+This code provides a comprehensive to-do list management UI with functionalities for fetching, filtering, adding, updating, marking as done, and removing to-do items, all managed through BLoC state management.
+
+References
+From the attached context:
+- /Users/prasantpandey/IdeaProjects/todo_list_app/lib/app/view/features/todo/screen/todo_list_page.dart:0-591
+  From this repository:
+- /lib/app/view/features/todo/bloc/todo_state.dart:1-195
+- /lib/app/view/features/todo/extension/todo_state_extension.dart:1-190
+- /lib/app/view/features/todo/bloc/todo_event.dart:1-132
+- /lib/app/view/features/todo/bloc/get_todo/get_todo_bloc.dart:1-102
+- /lib/app/view/features/todo/bloc/add_todo/add_todo_bloc.dart:1-74
+- /lib/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart:1-58
+- /lib/app/view/features/todo/bloc/mark_todo/mark_todo_bloc.dart:1-28
+- /lib/app/view/features/todo/widget/todo_item.dart:1-53
+- /lib/app/view/features/todo/widget/todo_filter_widget.dart:1-39
+- /lib/app/common/todo_actions.dart:1-19
+- /lib/app/common/screen_state_enum.dart:1-12
+- /lib/app/view/features/todo/widget/todo_form.dart:1-189
+- /lib/app/widget/gradientText.dart:1-25
+- /lib/app/common/global_config.dart:1-98
+- /lib/app/widget/page_body.dart:1-89
+- /features/todo/api/lib/api.dart:1-4

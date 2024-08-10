@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +19,28 @@ import 'package:todo_list_app/app/view/features/todo/widget/todo_form.dart';
 import 'package:todo_list_app/app/view/features/todo/widget/todo_item.dart';
 import 'package:todo_list_app/app/widget/gradientText.dart';
 import 'package:todo_list_app/app/widget/page_body.dart';
+
+///
+/// To use the TodoListPage widget, simply include it in your widget tree.
+// MaterialApp(
+//   home: TodoListPage(),
+// );
+///
+
+/// 1. The initState method fetches the initial list of to-do items.
+/// 2. The build method constructs the UI, including the app bar,
+/// floating action button, and the main body with a list of to-do items.
+/// 3. The _fetchTodoList method triggers the fetching of all to-do items.
+/// 4. The _filterTodo method filters the to-do items based on the selected filter.
+/// 5. The _listenState method listens to state changes and
+/// updates the UI accordingly.
+
+///
+/// A UI displaying the list of to-do items, with options to add,
+/// update, mark as done, and remove items.
+/// State changes are reflected in the UI, such as loading indicators,
+/// empty states, and filtered lists.
+///
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
@@ -177,10 +197,9 @@ class _TodoListPageState extends State<TodoListPage> {
         if (!state.hasOpened) {
           Navigator.of(context).pop();
         } else {
-          Future.delayed(
-            Durations.short2,
-            () async => _openDialog(state.todoEntity, isNew: state.isNew),
-          );
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _openDialog(state.todoEntity, isNew: state.isNew);
+          });
         }
       },
       discardTodo: (state) {
@@ -192,14 +211,13 @@ class _TodoListPageState extends State<TodoListPage> {
         if (!state.hasOpened) {
           Navigator.of(context).pop();
         } else {
-          Future.delayed(
-            Durations.short2,
-            () async => _openDialog(
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _openDialog(
               state.todoEntity,
               isNew: false,
               showMeDetails: true,
-            ),
-          );
+            );
+          });
         }
       },
       processing: (state) {
