@@ -16,7 +16,6 @@ dependencies:
     path: ../../../common/domain
   flutter:
     sdk: flutter
-  mockito: ^5.4.4
   todo_api:
     path: ../api
 

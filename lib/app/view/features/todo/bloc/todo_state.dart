@@ -87,11 +87,10 @@ class GetTodoState extends TodoState {
   List<Object?> get props => [todoEntity];
 }
 
-class YieldAllTodoState extends TodoState {
-  const YieldAllTodoState({this.todoEntities = const [],this.message =''});
+class GetAllTodoState extends TodoState {
+  const GetAllTodoState({this.todoEntities = const []});
 
   final List<TodoEntity> todoEntities;
-  final String message;
 
   @override
   List<Object?> get props => [todoEntities];
