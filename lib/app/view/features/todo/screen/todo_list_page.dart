@@ -221,38 +221,40 @@ class _TodoListPageState extends State<TodoListPage> {
   void _updatePageState(TodoState todoState) {
     todoState.mayBeMap(
       orElse: () {
-        buildPageState = TodoListBuildPageState.loaded;
-      },
-      yieldAllTodo: (state) {
-        allTodos = List<TodoEntity>.from(state.allTodos.toList());
-        allPendingTodos = List<TodoEntity>.from(state.allPendingTodos.toList());
-        allCompletedTodos =
-            List<TodoEntity>.from(state.allCompletedTodos.toList());
-
-        _fetchAllTodoFromFilter();
-        _countAllTodo();
-      },
-      removeAll: (state) {
         buildPageState = TodoListBuildPageState.empty;
-        todoEntities = [];
-        allTodos = [];
-        allPendingTodos = [];
-        allCompletedTodos = [];
-        _countAllTodo();
       },
+      yieldAllTodo: _yieldAllTodo,
+      removeAll: _emptyState,
       filterAll: (state) {
         currentSelectedFiler = state.filter;
         _fetchAllTodoFromFilter();
       },
-      empty: (state) {
-        buildPageState = TodoListBuildPageState.empty;
-      },
+      empty: _emptyState,
       loading: (state) {
         isTodoLoading = state.isLoading;
         buildPageState = TodoListBuildPageState.loading;
       },
     );
   }
+
+  void _yieldAllTodo(YieldAllTodoState state) {
+      allTodos = List<TodoEntity>.from(state.allTodos.toList());
+      allPendingTodos = List<TodoEntity>.from(state.allPendingTodos.toList());
+      allCompletedTodos =
+          List<TodoEntity>.from(state.allCompletedTodos.toList());
+
+      _fetchAllTodoFromFilter();
+      _countAllTodo();
+    }
+
+  void _emptyState(state) {
+      buildPageState = TodoListBuildPageState.empty;
+      todoEntities = [];
+      allTodos = [];
+      allPendingTodos = [];
+      allCompletedTodos = [];
+      _countAllTodo();
+    }
 
   void _countAllTodo() {
     countTotalTodo = allTodos.length;
