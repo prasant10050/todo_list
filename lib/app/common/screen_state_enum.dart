@@ -7,5 +7,5 @@ enum ScreenState {
 }
 
 enum TodoListBuildPageState{
-  loading,empty,loaded
+  loading,empty,loaded,listEmpty
 }

@@ -89,7 +89,7 @@ class _TodoListPageState extends State<TodoListPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if(buildPageState==TodoListBuildPageState.loaded)
+                        if(buildPageState==TodoListBuildPageState.loaded || buildPageState==TodoListBuildPageState.listEmpty)
                         ...[TodoFilterWidget(
                           onFilter: _filterTodo,
                         ),
@@ -210,13 +210,15 @@ class _TodoListPageState extends State<TodoListPage> {
       },
       removeAll: (state) {
         buildPageState = TodoListBuildPageState.empty;
-        countTotalTodo = todoEntities.length;
+        countTotalTodo = 0;
         countCompletedTodo = 0;
       },
       filterAll: (state) {
-        buildPageState = TodoListBuildPageState.loaded;
         if(state.todoEntities.isNotEmpty) {
+          buildPageState = TodoListBuildPageState.loaded;
           todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+        }else{
+          buildPageState = TodoListBuildPageState.listEmpty;
         }
       },
       empty: (state) {
@@ -386,21 +388,11 @@ class _TodoListViewState extends State<_TodoListView> {
     }
 
     if (widget.buildPageState == TodoListBuildPageState.empty) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/tasks.png',
-            fit: BoxFit.cover,
-            height: media.size.height * 0.3,
-          ),
-          Text(
-            'No todos found. Add some tasks to get started.',
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      );
+      return const _TodoEmpty();
+    }
+
+    if (widget.buildPageState == TodoListBuildPageState.listEmpty) {
+      return const _TodoEmpty(message: 'No todo found',);
     }
 
     return CustomScrollView(
@@ -424,6 +416,34 @@ class _TodoListViewState extends State<_TodoListView> {
             },
             childCount: widget.todoEntities.length,
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TodoEmpty extends StatelessWidget {
+  const _TodoEmpty({
+    super.key,
+    this.message='No todos found. Add some tasks to get started.',
+  });
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final media=MediaQuery.of(context);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          'assets/images/tasks.png',
+          fit: BoxFit.cover,
+          height: media.size.height * 0.3,
+        ),
+        Text(
+          message,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
         ),
       ],
     );
