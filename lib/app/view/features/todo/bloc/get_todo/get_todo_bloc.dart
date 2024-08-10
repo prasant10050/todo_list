@@ -80,9 +80,8 @@ class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
     await _execute<Failure, List<TodoEntity>>(
       emit,
       () => filterAllTodoUsecase(event.filter),
-      (right) => right.isEmpty
-          ? const TodoEmpty()
-          : FilterTodoState(todoEntities: right.toList(), filter: event.filter),
+      (right) =>
+          FilterTodoState(todoEntities: right.toList(), filter: event.filter),
     );
   }
 }

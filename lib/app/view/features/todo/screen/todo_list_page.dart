@@ -59,7 +59,7 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
       child: Scaffold(
         appBar: _TodoAppBar(),
-        floatingActionButton: _AddTodoButton(),
+        floatingActionButton: _TodoFloatingActionButton(),
         body: PageBody(
           controller: ScrollController(),
           constraints: BoxConstraints(
@@ -215,7 +215,9 @@ class _TodoListPageState extends State<TodoListPage> {
       },
       filterAll: (state) {
         buildPageState = TodoListBuildPageState.loaded;
-        todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+        if(state.todoEntities.isNotEmpty) {
+          todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+        }
       },
       empty: (state) {
         buildPageState = TodoListBuildPageState.empty;
@@ -228,15 +230,29 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 }
 
-class _AddTodoButton extends StatelessWidget {
+class _TodoFloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        context.read<AddTodoBloc>().add(const OpenAddTodoDialogRequested());
-      },
-      tooltip: 'Add Todo',
-      child: const Icon(Icons.add),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+       /* FloatingActionButton(
+          onPressed: () {
+            context.read<RemoveTodoBloc>().add(const RemoveAllTodoRequested());
+          },
+          tooltip: 'Remove all todos',
+          child: const Icon(Icons.delete_forever),
+        ),
+        const SizedBox(height: 16,),*/
+        FloatingActionButton(
+          onPressed: () {
+            context.read<AddTodoBloc>().add(const OpenAddTodoDialogRequested());
+          },
+          tooltip: 'Add Todo',
+          child: const Icon(Icons.add),
+        ),
+      ],
     );
   }
 }
