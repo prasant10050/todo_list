@@ -34,6 +34,11 @@ class _TodoListPageState extends State<TodoListPage> {
   bool hasTodoEmpty = false;
   var countTotalTodo = 0;
   var countCompletedTodo = 0;
+  var countPendingTodo = 0;
+  List<TodoEntity> allTodos = [];
+  List<TodoEntity> allPendingTodos = [];
+  List<TodoEntity> allCompletedTodos = [];
+  Filter currentSelectedFiler=Filter.all;
 
   TodoListBuildPageState buildPageState = TodoListBuildPageState.loading;
 
@@ -89,16 +94,19 @@ class _TodoListPageState extends State<TodoListPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if(buildPageState==TodoListBuildPageState.loaded || buildPageState==TodoListBuildPageState.listEmpty)
-                        ...[TodoFilterWidget(
-                          onFilter: _filterTodo,
-                        ),
-                        const Divider(),
-                        _TodoSummary(
-                          countCompletedTodo: countCompletedTodo,
-                          countTotalTodo: countTotalTodo,
-                        ),
-                        const Divider(),],
+                        if (buildPageState == TodoListBuildPageState.loaded ||
+                            buildPageState ==
+                                TodoListBuildPageState.listEmpty) ...[
+                          TodoFilterWidget(
+                            onFilter: _filterTodo,
+                          ),
+                          const Divider(),
+                          _TodoSummary(
+                            countCompletedTodo: countCompletedTodo,
+                            countTotalTodo: countTotalTodo,
+                          ),
+                          const Divider(),
+                        ],
                         Expanded(
                           child: _TodoListView(
                             buildPageState: buildPageState,
@@ -141,8 +149,19 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   void _filterTodo(Filter filter) {
+    currentSelectedFiler=filter;
     if (context.mounted) {
       context.read<GetTodoBloc>().add(FilterTodoRequested(filter: filter));
+    }
+  }
+  List<TodoEntity> getSelectedList([Filter filter=Filter.all]) {
+    switch (filter) {
+      case Filter.all:
+        return allTodos;
+      case Filter.pending:
+        return allPendingTodos;
+      case Filter.completed:
+        return allCompletedTodos;
     }
   }
 
@@ -203,21 +222,30 @@ class _TodoListPageState extends State<TodoListPage> {
       },
       yieldAllTodo: (state) {
         buildPageState = TodoListBuildPageState.loaded;
-        todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
-        countTotalTodo = todoEntities.length;
-        countCompletedTodo =
-            todoEntities.where((task) => task.isCompleted).length;
+        allTodos = List<TodoEntity>.from(state.allTodos.toList());
+        allPendingTodos = List<TodoEntity>.from(state.allPendingTodos.toList());
+        allCompletedTodos =
+            List<TodoEntity>.from(state.allCompletedTodos.toList());
+
+        todoEntities = getSelectedList(currentSelectedFiler);
+        countTotalTodo = allTodos.length;
+        countCompletedTodo = allCompletedTodos.length;
+        countPendingTodo=allPendingTodos.length;
       },
       removeAll: (state) {
         buildPageState = TodoListBuildPageState.empty;
         countTotalTodo = 0;
         countCompletedTodo = 0;
+        countPendingTodo=0;
       },
       filterAll: (state) {
-        if(state.todoEntities.isNotEmpty) {
+        currentSelectedFiler=state.filter;
+        todoEntities = getSelectedList(currentSelectedFiler);
+        if (todoEntities.isNotEmpty) {
           buildPageState = TodoListBuildPageState.loaded;
-          todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
-        }else{
+
+          //List<TodoEntity>.from(state.todoEntities.toList());
+        } else {
           buildPageState = TodoListBuildPageState.listEmpty;
         }
       },
@@ -239,7 +267,7 @@ class _TodoFloatingActionButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-       /* FloatingActionButton(
+        /* FloatingActionButton(
           onPressed: () {
             context.read<RemoveTodoBloc>().add(const RemoveAllTodoRequested());
           },
@@ -392,7 +420,9 @@ class _TodoListViewState extends State<_TodoListView> {
     }
 
     if (widget.buildPageState == TodoListBuildPageState.listEmpty) {
-      return const _TodoEmpty(message: 'No todo found',);
+      return const _TodoEmpty(
+        message: 'No todo found',
+      );
     }
 
     return CustomScrollView(
@@ -425,13 +455,14 @@ class _TodoListViewState extends State<_TodoListView> {
 class _TodoEmpty extends StatelessWidget {
   const _TodoEmpty({
     super.key,
-    this.message='No todos found. Add some tasks to get started.',
+    this.message = 'No todos found. Add some tasks to get started.',
   });
+
   final String message;
 
   @override
   Widget build(BuildContext context) {
-    final media=MediaQuery.of(context);
+    final media = MediaQuery.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

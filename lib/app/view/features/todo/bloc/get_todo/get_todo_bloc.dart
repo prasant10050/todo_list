@@ -38,9 +38,23 @@ class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
     await _execute<Failure, List<TodoEntity>>(
       emit,
       getAllTodoUsecase.call,
-      (right) => right.isEmpty
-          ? const TodoEmpty()
-          : YieldAllTodoState(todoEntities: right.toList()),
+      (right) {
+        if (right.isEmpty) {
+          return const TodoEmpty();
+        } else {
+          final todos = List<TodoEntity>.from(right.toList(growable: false));
+          final allCompletedTodo =
+              todos.where((task) => task.isCompleted).toList(growable: false);
+          final allPendingTodo =
+              todos.where((task) => !task.isCompleted).toList(growable: false);
+          return YieldAllTodoState(
+            todoEntities: right.toList(),
+            allTodos: todos,
+            allCompletedTodos: allCompletedTodo,
+            allPendingTodos: allPendingTodo,
+          );
+        }
+      },
     );
   }
 

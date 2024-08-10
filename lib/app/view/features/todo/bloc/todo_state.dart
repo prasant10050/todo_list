@@ -88,9 +88,17 @@ class GetTodoState extends TodoState {
 }
 
 class YieldAllTodoState extends TodoState {
-  const YieldAllTodoState({this.todoEntities = const []});
+  const YieldAllTodoState({
+    this.todoEntities = const [],
+    this.allCompletedTodos = const [],
+    this.allPendingTodos = const [],
+    this.allTodos = const [],
+  });
 
   final List<TodoEntity> todoEntities;
+  final List<TodoEntity> allTodos;
+  final List<TodoEntity> allPendingTodos;
+  final List<TodoEntity> allCompletedTodos;
 
   @override
   List<Object?> get props => [todoEntities];
@@ -145,7 +153,7 @@ class OpenAddTodoDialogState extends TodoState {
   final bool isNew;
 
   @override
-  List<Object?> get props => [hasOpened, todoEntity,isNew];
+  List<Object?> get props => [hasOpened, todoEntity, isNew];
 }
 
 class DiscardTodoDialogState extends TodoState {
