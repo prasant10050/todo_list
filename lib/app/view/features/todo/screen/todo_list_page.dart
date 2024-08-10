@@ -38,7 +38,7 @@ class _TodoListPageState extends State<TodoListPage> {
   List<TodoEntity> allTodos = [];
   List<TodoEntity> allPendingTodos = [];
   List<TodoEntity> allCompletedTodos = [];
-  Filter currentSelectedFiler=Filter.all;
+  Filter currentSelectedFiler = Filter.all;
 
   TodoListBuildPageState buildPageState = TodoListBuildPageState.loading;
 
@@ -64,7 +64,9 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
       child: Scaffold(
         appBar: _TodoAppBar(),
-        floatingActionButton: _TodoFloatingActionButton(),
+        floatingActionButton: _TodoFloatingActionButton(
+          hasTodoEmpty: allTodos.isEmpty,
+        ),
         body: PageBody(
           controller: ScrollController(),
           constraints: BoxConstraints(
@@ -142,19 +144,20 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 
-  void _fetchTodoList(BuildContext context,[Filter filter=Filter.all]) {
+  void _fetchTodoList(BuildContext context, [Filter filter = Filter.all]) {
     if (context.mounted) {
       context.read<GetTodoBloc>().add(const GetAllTodoRequested());
     }
   }
 
   void _filterTodo(Filter filter) {
-    currentSelectedFiler=filter;
+    currentSelectedFiler = filter;
     if (context.mounted) {
       context.read<GetTodoBloc>().add(FilterTodoRequested(filter: filter));
     }
   }
-  List<TodoEntity> getSelectedList([Filter filter=Filter.all]) {
+
+  List<TodoEntity> _getSelectedList([Filter filter = Filter.all]) {
     switch (filter) {
       case Filter.all:
         return allTodos;
@@ -201,16 +204,16 @@ class _TodoListPageState extends State<TodoListPage> {
         isTodoProcessing = state.isProcessing;
       },
       addTodo: (state) {
-        _fetchTodoList(context,currentSelectedFiler);
+        _fetchTodoList(context, currentSelectedFiler);
       },
       markAsDone: (state) {
-        _fetchTodoList(context,currentSelectedFiler);
+        _fetchTodoList(context, currentSelectedFiler);
       },
       remove: (state) {
-        _fetchTodoList(context,currentSelectedFiler);
+        _fetchTodoList(context, currentSelectedFiler);
       },
       updateTodo: (state) {
-        _fetchTodoList(context,currentSelectedFiler);
+        _fetchTodoList(context, currentSelectedFiler);
       },
     );
   }
@@ -231,13 +234,14 @@ class _TodoListPageState extends State<TodoListPage> {
       },
       removeAll: (state) {
         buildPageState = TodoListBuildPageState.empty;
-        allTodos=[];
-        allPendingTodos=[];
-        allCompletedTodos=[];
+        todoEntities = [];
+        allTodos = [];
+        allPendingTodos = [];
+        allCompletedTodos = [];
         _countAllTodo();
       },
       filterAll: (state) {
-        currentSelectedFiler=state.filter;
+        currentSelectedFiler = state.filter;
         _fetchAllTodoFromFilter();
       },
       empty: (state) {
@@ -253,11 +257,11 @@ class _TodoListPageState extends State<TodoListPage> {
   void _countAllTodo() {
     countTotalTodo = allTodos.length;
     countCompletedTodo = allCompletedTodos.length;
-    countPendingTodo=allPendingTodos.length;
+    countPendingTodo = allPendingTodos.length;
   }
 
   void _fetchAllTodoFromFilter() {
-    todoEntities = getSelectedList(currentSelectedFiler);
+    todoEntities = _getSelectedList(currentSelectedFiler);
     if (todoEntities.isNotEmpty) {
       buildPageState = TodoListBuildPageState.loaded;
     } else {
@@ -267,20 +271,30 @@ class _TodoListPageState extends State<TodoListPage> {
 }
 
 class _TodoFloatingActionButton extends StatelessWidget {
+  const _TodoFloatingActionButton({required this.hasTodoEmpty});
+
+  final bool hasTodoEmpty;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        /* FloatingActionButton(
-          onPressed: () {
-            context.read<RemoveTodoBloc>().add(const RemoveAllTodoRequested());
-          },
-          tooltip: 'Remove all todos',
-          child: const Icon(Icons.delete_forever),
-        ),
-        const SizedBox(height: 16,),*/
+        if (!hasTodoEmpty) ...[
+          FloatingActionButton(
+            onPressed: () {
+              context
+                  .read<RemoveTodoBloc>()
+                  .add(const RemoveAllTodoRequested());
+            },
+            tooltip: 'Remove all todos',
+            child: const Icon(Icons.delete_forever),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+        ],
         FloatingActionButton(
           onPressed: () {
             context.read<AddTodoBloc>().add(const OpenAddTodoDialogRequested());
@@ -416,7 +430,6 @@ class _TodoListViewState extends State<_TodoListView> {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
     if (widget.buildPageState == TodoListBuildPageState.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -460,7 +473,6 @@ class _TodoListViewState extends State<_TodoListView> {
 
 class _TodoEmpty extends StatelessWidget {
   const _TodoEmpty({
-    super.key,
     this.message = 'No todos found. Add some tasks to get started.',
   });
 

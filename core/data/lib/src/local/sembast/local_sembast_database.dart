@@ -76,10 +76,10 @@ class LocalSembastDataDao implements BaseStorage {
   @override
   Future<void> clear() async {
     final db = await _db;
-    await db.transaction((transaction) async {
+/*    await db.transaction((transaction) async {
       // Delete all
       await _todoStore.delete(transaction);
-    });
+    });*/
     await _todoStore.delete(await _db);
   }
 

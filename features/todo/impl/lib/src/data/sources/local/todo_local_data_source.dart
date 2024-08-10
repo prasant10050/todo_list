@@ -14,8 +14,7 @@ class TodoLocalDataSource implements ITodoDataSource {
   Future<Either<Failure, TodoDto>> addTodo(TodoEntity todoEntity) async {
     try {
       final newTaskId = TaskId.generate();
-      final copyEntity =
-          todoEntity.copyWith(taskId: newTaskId);
+      final copyEntity = todoEntity.copyWith(taskId: newTaskId);
       await storage.put(newTaskId.value, copyEntity.toMap());
       final result = mapper.mapFromEntity(copyEntity);
       return Right(result);
@@ -51,7 +50,7 @@ class TodoLocalDataSource implements ITodoDataSource {
       if (todo == null) {
         return const Left(DatabaseFailure('Could not get todo: {}'));
       }
-      final result = TodoDto.fromMap(todo as Map<String,dynamic>);
+      final result = TodoDto.fromMap(todo as Map<String, dynamic>);
       return Right(result);
     } catch (e) {
       debugPrint('GetTodo exception: $e');
