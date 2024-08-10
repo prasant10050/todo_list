@@ -40,7 +40,7 @@ class GetTodoBloc extends Bloc<TodoEvent, TodoState> {
       getAllTodoUsecase.call,
       (right) => right.isEmpty
           ? const TodoEmpty()
-          : GetAllTodoState(todoEntities: right.toList()),
+          : YieldAllTodoState(todoEntities: right.toList()),
     );
   }
 

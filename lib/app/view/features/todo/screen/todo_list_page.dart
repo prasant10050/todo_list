@@ -201,7 +201,7 @@ class _TodoListPageState extends State<TodoListPage> {
       orElse: () {
         buildPageState = TodoListBuildPageState.loaded;
       },
-      getAll: (state) {
+      yieldAllTodo: (state) {
         buildPageState = TodoListBuildPageState.loaded;
         todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
         countTotalTodo = todoEntities.length;

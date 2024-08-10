@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/todo_state.dart';
 
 extension TodoStateX on TodoState {
@@ -10,7 +9,7 @@ extension TodoStateX on TodoState {
     required T Function(RemoveTodoState) remove,
     required T Function(RemoveAllTodoState) removeAll,
     required T Function(GetTodoState) getById,
-    required T Function(GetAllTodoState) getAll,
+    required T Function(YieldAllTodoState) yieldAllTodo,
     required T Function(AddTodoSuccess) addTodo,
     required T Function(UpdateTodoState) updateTodo,
     required T Function(MarkTodoState) markAsDone,
@@ -39,8 +38,8 @@ extension TodoStateX on TodoState {
       return removeAll(this as RemoveAllTodoState);
     } else if (this is GetTodoState) {
       return getById(this as GetTodoState);
-    } else if (this is GetAllTodoState) {
-      return getAll(this as GetAllTodoState);
+    } else if (this is YieldAllTodoState) {
+      return yieldAllTodo(this as YieldAllTodoState);
     } else if (this is AddTodoSuccess) {
       return addTodo(this as AddTodoSuccess);
     } else if (this is UpdateTodoState) {
@@ -64,14 +63,15 @@ extension TodoStateX on TodoState {
 
   // mayBeMap
   T mayBeMap<T>({
-    required T Function() orElse, T Function(TodoLoading)? loading,
+    required T Function() orElse,
+    T Function(TodoLoading)? loading,
     T Function(TodoProcessing)? processing,
     T Function(TodoEmpty)? empty,
     T Function(TodoFailure)? error,
     T Function(RemoveTodoState)? remove,
     T Function(RemoveAllTodoState)? removeAll,
     T Function(GetTodoState)? getById,
-    T Function(GetAllTodoState)? getAll,
+    T Function(YieldAllTodoState)? yieldAllTodo,
     T Function(AddTodoSuccess)? addTodo,
     T Function(UpdateTodoState)? updateTodo,
     T Function(MarkTodoState)? markAsDone,
@@ -97,8 +97,10 @@ extension TodoStateX on TodoState {
           : orElse();
     } else if (this is GetTodoState) {
       return getById != null ? getById(this as GetTodoState) : orElse();
-    } else if (this is GetAllTodoState) {
-      return getAll != null ? getAll(this as GetAllTodoState) : orElse();
+    } else if (this is YieldAllTodoState) {
+      return yieldAllTodo != null
+          ? yieldAllTodo(this as YieldAllTodoState)
+          : orElse();
     } else if (this is AddTodoSuccess) {
       return addTodo != null ? addTodo(this as AddTodoSuccess) : orElse();
     } else if (this is UpdateTodoState) {
@@ -138,7 +140,7 @@ extension TodoStateX on TodoState {
     T Function(RemoveTodoState)? remove,
     T Function(RemoveAllTodoState)? removeAll,
     T Function(GetTodoState)? getById,
-    T Function(GetAllTodoState)? getAll,
+    T Function(YieldAllTodoState)? yieldAllTodo,
     T Function(AddTodoSuccess)? addTodo,
     T Function(UpdateTodoState)? updateTodo,
     T Function(MarkTodoState)? markAsDone,
@@ -150,8 +152,7 @@ extension TodoStateX on TodoState {
   }) {
     if (this is TodoLoading) {
       return loading?.call(this as TodoLoading);
-    }
-    else if (this is TodoProcessing) {
+    } else if (this is TodoProcessing) {
       return processing?.call(this as TodoProcessing);
     } else if (this is TodoFailure) {
       return error?.call(this as TodoFailure);
@@ -159,13 +160,12 @@ extension TodoStateX on TodoState {
       return empty?.call(this as TodoEmpty);
     } else if (this is RemoveTodoState) {
       return remove?.call(this as RemoveTodoState);
-    }
-    else if (this is RemoveAllTodoState) {
+    } else if (this is RemoveAllTodoState) {
       return removeAll?.call(this as RemoveAllTodoState);
     } else if (this is GetTodoState) {
       return getById?.call(this as GetTodoState);
-    } else if (this is GetAllTodoState) {
-      return getAll?.call(this as GetAllTodoState);
+    } else if (this is YieldAllTodoState) {
+      return yieldAllTodo?.call(this as YieldAllTodoState);
     } else if (this is AddTodoSuccess) {
       return addTodo?.call(this as AddTodoSuccess);
     } else if (this is UpdateTodoState) {
