@@ -101,7 +101,12 @@ class YieldAllTodoState extends TodoState {
   final List<TodoEntity> allCompletedTodos;
 
   @override
-  List<Object?> get props => [todoEntities];
+  List<Object?> get props => [
+        todoEntities,
+        allCompletedTodos,
+        allCompletedTodos,
+        allTodos,
+      ];
 }
 
 class MarkTodoState extends TodoState {
