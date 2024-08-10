@@ -201,21 +201,18 @@ class _TodoListPageState extends State<TodoListPage> {
       orElse: () {
         buildPageState = TodoListBuildPageState.loaded;
       },
-      getAll: (state) {
+      yieldAllTodo: (state) {
         buildPageState = TodoListBuildPageState.loaded;
         todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
         countTotalTodo = todoEntities.length;
         countCompletedTodo =
             todoEntities.where((task) => task.isCompleted).length;
       },
-      removeAll: (state) {
-        buildPageState = TodoListBuildPageState.empty;
-        countTotalTodo = todoEntities.length;
-        countCompletedTodo = 0;
-      },
       filterAll: (state) {
         buildPageState = TodoListBuildPageState.loaded;
-        todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+        if(state.todoEntities.isNotEmpty) {
+          todoEntities = List<TodoEntity>.from(state.todoEntities.toList());
+        }
       },
       empty: (state) {
         buildPageState = TodoListBuildPageState.empty;

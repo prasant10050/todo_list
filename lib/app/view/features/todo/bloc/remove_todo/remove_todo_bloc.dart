@@ -34,7 +34,7 @@ class RemoveTodoBloc extends Bloc<TodoEvent, TodoState> {
     await _execute<Failure, void>(
       emit,
       removeAllTodoUsecase.call,
-      const RemoveAllTodoState(),
+      const YieldAllTodoState(message: 'Remove all todo successfully'),
     );
   }
 
