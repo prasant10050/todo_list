@@ -5,6 +5,7 @@ import 'package:todo_list_app/app/view/features/todo/bloc/get_todo/get_todo_bloc
 import 'package:todo_list_app/app/view/features/todo/bloc/mark_todo/mark_todo_bloc.dart';
 import 'package:todo_list_app/app/view/features/todo/bloc/remove_todo/remove_todo_bloc.dart';
 
+//Please generate all unit test cases for the below class with mocktail, di packages from pub.dev, but this class is depending on di module.
 class ApplicationDependenciesModuleResolver {
   static const String inMemory = 'in-memory';
   static const String local = 'local';

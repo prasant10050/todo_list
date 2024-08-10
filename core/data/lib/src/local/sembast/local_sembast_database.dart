@@ -129,9 +129,9 @@ class LocalSembastDataDao implements BaseStorage {
   }
 
   @override
-  Future<dynamic> getByKey(String id, {dynamic defaultValue}) async {
+  Future<dynamic> getByKey(String id) async {
     final record = await _todoStore.record(id).get(await _db);
-    return record ?? defaultValue;
+    return record;
   }
 
   @override

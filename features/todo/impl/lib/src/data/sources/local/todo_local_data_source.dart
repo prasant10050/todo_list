@@ -76,7 +76,7 @@ class TodoLocalDataSource implements ITodoDataSource {
   @override
   Future<Either<Failure, void>> removeAllTodos() async {
     try {
-      return Right(storage.clear());
+      return Right(await storage.clear());
     } catch (e) {
       debugPrint('RemoveAllTodos exception: $e');
       return const Left(DatabaseFailure('Could not add todo: {}'));

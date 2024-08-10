@@ -23,7 +23,7 @@ class RemoveTodoBloc extends Bloc<TodoEvent, TodoState> {
     await _execute<Failure, void>(
       emit,
       () => removeTodoUsecase(event.taskId),
-      const RemoveTodoState(),
+      (right) => const RemoveTodoState(),
     );
   }
 
@@ -34,14 +34,16 @@ class RemoveTodoBloc extends Bloc<TodoEvent, TodoState> {
     await _execute<Failure, void>(
       emit,
       removeAllTodoUsecase.call,
-      const RemoveAllTodoState(),
+      (right) {
+        return const RemoveAllTodoState();
+      },
     );
   }
 
   Future<void> _execute<L, R>(
     Emitter<TodoState> emit,
     Future<Either<L, R>> Function() usecase,
-    TodoState successState,
+    TodoState Function(R) onSuccess,
   ) async {
     emit(const TodoProcessing());
     final result = await usecase();
@@ -49,7 +51,7 @@ class RemoveTodoBloc extends Bloc<TodoEvent, TodoState> {
 
     result.fold(
       (left) => emit(TodoFailure(message: (left as Failure).message)),
-      (right) => emit(successState),
+      (right) => emit(onSuccess(right)),
     );
   }
 }

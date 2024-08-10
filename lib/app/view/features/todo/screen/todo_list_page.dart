@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -221,7 +223,7 @@ class _TodoListPageState extends State<TodoListPage> {
   void _updatePageState(TodoState todoState) {
     todoState.mayBeMap(
       orElse: () {
-        buildPageState = TodoListBuildPageState.empty;
+        buildPageState = TodoListBuildPageState.loaded;
       },
       yieldAllTodo: _yieldAllTodo,
       removeAll: _emptyState,

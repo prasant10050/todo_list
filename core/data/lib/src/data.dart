@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:localstore/localstore.dart';
 
 abstract class BaseStorage {
-  Future<dynamic> getByKey(String id, {dynamic defaultValue});
+  Future<dynamic> getByKey(String id);
 
   Future<dynamic> put(String id, Map<String, dynamic> entity);
 
